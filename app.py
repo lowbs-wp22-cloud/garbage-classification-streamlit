@@ -41,7 +41,6 @@ init_db()
 # =============================
 MODEL_PATH = "garbage_classifier.h5"
 
-
 @st.cache_resource
 def load_model():
     if not os.path.exists(MODEL_PATH):
@@ -81,9 +80,7 @@ def login_user(email, password):
     c.execute("SELECT password FROM users WHERE email = ?", (email,))
     result = c.fetchone()
     conn.close()
-    if result and check_password_hash(result[0], password):
-        return True
-    return False
+    return result and check_password_hash(result[0], password)
 
 # =============================
 # UI
@@ -91,6 +88,9 @@ def login_user(email, password):
 st.title("♻️ AI Garbage Classification System")
 st.caption("Final Year Project – Streamlit Interface")
 
+# =============================
+# AUTH PAGES
+# =============================
 if st.session_state.user is None:
     menu = st.sidebar.radio("Navigation", ["Login", "Sign Up"])
 
@@ -126,7 +126,7 @@ if st.session_state.user is None:
                 st.error("Email already exists")
 
 # =============================
-# UPLOAD & PREDICT
+# UPLOAD & AUTO-PREDICT
 # =============================
 else:
     st.sidebar.success(f"Logged in as {st.session_state.user}")
@@ -142,25 +142,27 @@ else:
     )
 
     if uploaded_file:
-    image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="Uploaded Image", use_container_width=True)
+        # ---- DISPLAY IMAGE ----
+        image = Image.open(uploaded_file).convert("RGB")
+        st.image(image, caption="Uploaded Image", use_container_width=True)
 
-    with st.spinner("Analyzing image..."):
-        img = image.resize((224, 224))
-        img_array = np.array(img) / 255.0
-        img_array = np.expand_dims(img_array, axis=0)
+        # ---- AUTO PREDICTION ----
+        with st.spinner("Analyzing image..."):
+            img = image.resize((224, 224))
+            img_array = np.array(img) / 255.0
+            img_array = np.expand_dims(img_array, axis=0)
 
-        prediction = model.predict(img_array)
-        class_index = np.argmax(prediction)
+            prediction = model.predict(img_array)
+            class_index = np.argmax(prediction)
 
-        labels = ["Paper", "Plastic", "Metal", "Glass", "Organic", "Trash"]
-        predicted_label = labels[class_index]
+            labels = ["Paper", "Plastic", "Metal", "Glass", "Organic", "Trash"]
+            predicted_label = labels[class_index]
 
-        category = (
-            "Recyclable"
-            if predicted_label != "Trash"
-            else "Non-Recyclable"
-        )
+            category = (
+                "Recyclable"
+                if predicted_label != "Trash"
+                else "Non-Recyclable"
+            )
 
-    st.success(f"♻️ Category: {category}")
-    st.info(f"📌 Details: {predicted_label}")
+        st.success(f"♻️ Category: {category}")
+        st.info(f"📌 Details: {predicted_label}")
