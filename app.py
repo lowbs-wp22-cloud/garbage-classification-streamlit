@@ -142,25 +142,25 @@ else:
     )
 
     if uploaded_file:
-        image = Image.open(uploaded_file).convert("RGB")
-        st.image(image, caption="Uploaded Image", use_container_width=True)
+    image = Image.open(uploaded_file).convert("RGB")
+    st.image(image, caption="Uploaded Image", use_container_width=True)
 
-        if st.button("🔍 Predict"):
-            with st.spinner("Running prediction..."):
-                img = image.resize((224, 224))
-                img_array = np.array(img) / 255.0
-                img_array = np.expand_dims(img_array, axis=0)
+    with st.spinner("Analyzing image..."):
+        img = image.resize((224, 224))
+        img_array = np.array(img) / 255.0
+        img_array = np.expand_dims(img_array, axis=0)
 
-                prediction = model.predict(img_array)
-                class_index = np.argmax(prediction)
+        prediction = model.predict(img_array)
+        class_index = np.argmax(prediction)
 
-                labels = ["Paper", "Plastic", "Metal", "Glass", "Organic", "Trash"]
-                predicted_label = labels[class_index]
+        labels = ["Paper", "Plastic", "Metal", "Glass", "Organic", "Trash"]
+        predicted_label = labels[class_index]
 
-                category = (
-                    "Recyclable" if predicted_label != "Trash"
-                    else "Non-Recyclable"
-                )
+        category = (
+            "Recyclable"
+            if predicted_label != "Trash"
+            else "Non-Recyclable"
+        )
 
-            st.success(f"Category: {category}")
-            st.info(f"Details: {predicted_label}")
+    st.success(f"♻️ Category: {category}")
+    st.info(f"📌 Details: {predicted_label}")
