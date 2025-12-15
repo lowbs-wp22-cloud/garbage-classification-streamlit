@@ -39,7 +39,8 @@ init_db()
 # =============================
 # LOAD MODEL (ONCE)
 # =============================
-MODEL_PATH = "/content/drive/MyDrive/FYP/garbage_classifier.h5"
+MODEL_PATH = "garbage_classifier.h5"
+
 
 @st.cache_resource
 def load_model():
