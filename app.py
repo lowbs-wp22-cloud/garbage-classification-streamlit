@@ -48,7 +48,7 @@ init_db()
 # =============================
 @st.cache_resource
 def load_garbage_model():
-    return tf.keras.models.load_model("garbage_classifier.h5")
+    return tf.keras.models.load_model("general_waste.h5")
 
 @st.cache_resource
 def load_furniture_model():
