@@ -4,7 +4,6 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 from werkzeug.security import generate_password_hash, check_password_hash
-import os
 
 # =============================
 # PAGE CONFIG
@@ -58,9 +57,14 @@ def load_furniture_model():
 # =============================
 # SESSION STATE
 # =============================
-for key in ["user", "category", "reward_pending"]:
+for key, default in {
+    "user": None,
+    "category": None,
+    "current_page": "upload",
+    "reward_created": False
+}.items():
     if key not in st.session_state:
-        st.session_state[key] = None
+        st.session_state[key] = default
 
 # =============================
 # AUTH
@@ -102,18 +106,19 @@ elif st.session_state.category is None:
 
     if st.button("Continue"):
         st.session_state.category = category
+        st.session_state.current_page = "upload"
         st.rerun()
 
 # =============================
-# UPLOAD & PREDICT
+# UPLOAD & PREDICT PAGE
 # =============================
-elif st.session_state.reward_pending is None:
+elif st.session_state.current_page == "upload":
     st.subheader("Upload Image")
 
-    file = st.file_uploader("Upload garbage image", type=["jpg", "png", "jpeg"])
+    uploaded_file = st.file_uploader("Upload garbage image", type=["jpg", "png", "jpeg"])
 
-    if file:
-        image = Image.open(file).convert("RGB")
+    if uploaded_file:
+        image = Image.open(uploaded_file).convert("RGB")
         st.image(image, use_container_width=True)
 
         img = image.resize((224, 224))
@@ -132,24 +137,27 @@ elif st.session_state.reward_pending is None:
 
         st.success(f"Prediction Result: {result}")
 
-        # ----- CREATE PENDING REWARD -----
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute(
-            "INSERT INTO rewards VALUES (NULL, ?, ?, ?, ?)",
-            (st.session_state.user, 10, "PENDING", None)
-        )
-        conn.commit()
-        conn.close()
+        # Create reward ONLY ONCE
+        if not st.session_state.reward_created:
+            conn = sqlite3.connect(DB_PATH)
+            c = conn.cursor()
+            c.execute(
+                "INSERT INTO rewards VALUES (NULL, ?, ?, ?, ?)",
+                (st.session_state.user, 10, "PENDING", None)
+            )
+            conn.commit()
+            conn.close()
+            st.session_state.reward_created = True
 
-        st.session_state.reward_pending = True
-        st.rerun()
+        if st.button("🎁 Check Reward"):
+            st.session_state.current_page = "reward"
+            st.rerun()
 
 # =============================
 # REWARD PAGE
 # =============================
-else:
-    st.subheader("🎁 Reward Status")
+elif st.session_state.current_page == "reward":
+    st.subheader("🎁 Reward Page")
 
     st.info("You earned **10 points** (Status: PENDING)")
 
@@ -170,5 +178,9 @@ else:
         conn.close()
 
         st.success("✅ Points earned successfully!")
-        st.session_state.reward_pending = None
+
+        # Reset flow
         st.session_state.category = None
+        st.session_state.current_page = "upload"
+        st.session_state.reward_created = False
+        st.rerun()
