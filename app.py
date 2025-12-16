@@ -38,6 +38,15 @@ def init_db():
     )
     """)
 
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_email TEXT,
+        category TEXT,
+        result TEXT
+    )
+    """)
+
     conn.commit()
     conn.close()
 
@@ -78,6 +87,50 @@ def login_user(email, password):
     return row and check_password_hash(row[0], password)
 
 # =============================
+# SIDEBAR (AFTER LOGIN)
+# =============================
+if st.session_state.user:
+    st.sidebar.title("👤 User Dashboard")
+    st.sidebar.write(f"**Email:** {st.session_state.user}")
+
+    # ---- TOTAL EARNED POINTS ----
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("""
+        SELECT COALESCE(SUM(points), 0)
+        FROM rewards
+        WHERE user_email=? AND status='EARNED'
+    """, (st.session_state.user,))
+    total_points = c.fetchone()[0]
+
+    st.sidebar.metric("⭐ Total Points", total_points)
+
+    # ---- UPLOAD HISTORY ----
+    st.sidebar.subheader("📜 Upload History")
+    c.execute("""
+        SELECT category, result
+        FROM history
+        WHERE user_email=?
+        ORDER BY id DESC
+        LIMIT 5
+    """, (st.session_state.user,))
+    records = c.fetchall()
+    conn.close()
+
+    if records:
+        for cat, res in records:
+            st.sidebar.write(f"- **{cat}** → {res}")
+    else:
+        st.sidebar.caption("No history yet")
+
+    if st.sidebar.button("🚪 Logout"):
+        st.session_state.user = None
+        st.session_state.category = None
+        st.session_state.current_page = "upload"
+        st.session_state.reward_created = False
+        st.rerun()
+
+# =============================
 # UI HEADER
 # =============================
 st.title("♻️ Smart Recycling Reward System")
@@ -113,9 +166,9 @@ elif st.session_state.category is None:
 # UPLOAD & PREDICT PAGE
 # =============================
 elif st.session_state.current_page == "upload":
-    st.subheader("Upload Image")
+    st.subheader("📤 Upload Image")
 
-    uploaded_file = st.file_uploader("Upload garbage image", type=["jpg", "png", "jpeg"])
+    uploaded_file = st.file_uploader("Upload image", type=["jpg", "png", "jpeg"])
 
     if uploaded_file:
         image = Image.open(uploaded_file).convert("RGB")
@@ -137,17 +190,24 @@ elif st.session_state.current_page == "upload":
 
         st.success(f"Prediction Result: {result}")
 
-        # Create reward ONLY ONCE
+        # ---- SAVE HISTORY ----
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute(
+            "INSERT INTO history VALUES (NULL, ?, ?, ?)",
+            (st.session_state.user, st.session_state.category, result)
+        )
+
+        # ---- CREATE PENDING REWARD ONCE ----
         if not st.session_state.reward_created:
-            conn = sqlite3.connect(DB_PATH)
-            c = conn.cursor()
             c.execute(
                 "INSERT INTO rewards VALUES (NULL, ?, ?, ?, ?)",
                 (st.session_state.user, 10, "PENDING", None)
             )
-            conn.commit()
-            conn.close()
             st.session_state.reward_created = True
+
+        conn.commit()
+        conn.close()
 
         if st.button("🎁 Check Reward"):
             st.session_state.current_page = "reward"
@@ -179,7 +239,6 @@ elif st.session_state.current_page == "reward":
 
         st.success("✅ Points earned successfully!")
 
-        # Reset flow
         st.session_state.category = None
         st.session_state.current_page = "upload"
         st.session_state.reward_created = False
