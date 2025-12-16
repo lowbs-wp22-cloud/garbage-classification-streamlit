@@ -68,6 +68,7 @@ def load_furniture_model():
 # =============================
 for key, default in {
     "user": None,
+    "auth_mode": "Login",
     "category": None,
     "current_page": "upload",
     "reward_created": False
@@ -76,8 +77,23 @@ for key, default in {
         st.session_state[key] = default
 
 # =============================
-# AUTH
+# AUTH HELPERS
 # =============================
+def signup_user(username, email, password):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    try:
+        c.execute(
+            "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
+            (username, email, generate_password_hash(password))
+        )
+        conn.commit()
+        return True
+    except sqlite3.IntegrityError:
+        return False
+    finally:
+        conn.close()
+
 def login_user(email, password):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -93,7 +109,6 @@ if st.session_state.user:
     st.sidebar.title("👤 User Dashboard")
     st.sidebar.write(f"**Email:** {st.session_state.user}")
 
-    # ---- TOTAL EARNED POINTS ----
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
@@ -105,7 +120,6 @@ if st.session_state.user:
 
     st.sidebar.metric("⭐ Total Points", total_points)
 
-    # ---- UPLOAD HISTORY ----
     st.sidebar.subheader("📜 Upload History")
     c.execute("""
         SELECT category, result
@@ -114,20 +128,19 @@ if st.session_state.user:
         ORDER BY id DESC
         LIMIT 5
     """, (st.session_state.user,))
-    records = c.fetchall()
+    history = c.fetchall()
     conn.close()
 
-    if records:
-        for cat, res in records:
+    if history:
+        for cat, res in history:
             st.sidebar.write(f"- **{cat}** → {res}")
     else:
         st.sidebar.caption("No history yet")
 
     if st.sidebar.button("🚪 Logout"):
-        st.session_state.user = None
-        st.session_state.category = None
-        st.session_state.current_page = "upload"
-        st.session_state.reward_created = False
+        for k in ["user", "category", "current_page", "reward_created"]:
+            st.session_state[k] = None if k == "user" else "upload"
+        st.session_state.auth_mode = "Login"
         st.rerun()
 
 # =============================
@@ -136,22 +149,47 @@ if st.session_state.user:
 st.title("♻️ Smart Recycling Reward System")
 
 # =============================
-# LOGIN
+# LOGIN / SIGN UP CHOICE
 # =============================
 if st.session_state.user is None:
-    st.subheader("Login")
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
+    st.subheader("Welcome")
 
-    if st.button("Login"):
-        if login_user(email, password):
-            st.session_state.user = email
-            st.rerun()
-        else:
-            st.error("Invalid login")
+    st.radio(
+        "Choose an option",
+        ["Login", "Sign Up"],
+        key="auth_mode",
+        horizontal=True
+    )
+
+    # ---------- LOGIN ----------
+    if st.session_state.auth_mode == "Login":
+        email = st.text_input("Email")
+        password = st.text_input("Password", type="password")
+
+        if st.button("Login"):
+            if login_user(email, password):
+                st.session_state.user = email
+                st.rerun()
+            else:
+                st.error("Invalid email or password")
+
+    # ---------- SIGN UP ----------
+    else:
+        username = st.text_input("Username")
+        email = st.text_input("Email")
+        password = st.text_input("Password", type="password")
+
+        if st.button("Sign Up"):
+            if not username or not email or not password:
+                st.warning("Please fill in all fields")
+            elif signup_user(username, email, password):
+                st.success("Account created successfully. Please login.")
+                st.session_state.auth_mode = "Login"
+            else:
+                st.error("Email already exists")
 
 # =============================
-# CATEGORY
+# CATEGORY SELECTION
 # =============================
 elif st.session_state.category is None:
     st.subheader("Select Category")
@@ -163,7 +201,7 @@ elif st.session_state.category is None:
         st.rerun()
 
 # =============================
-# UPLOAD & PREDICT PAGE
+# UPLOAD & PREDICT
 # =============================
 elif st.session_state.current_page == "upload":
     st.subheader("📤 Upload Image")
@@ -190,7 +228,6 @@ elif st.session_state.current_page == "upload":
 
         st.success(f"Prediction Result: {result}")
 
-        # ---- SAVE HISTORY ----
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         c.execute(
@@ -198,7 +235,6 @@ elif st.session_state.current_page == "upload":
             (st.session_state.user, st.session_state.category, result)
         )
 
-        # ---- CREATE PENDING REWARD ONCE ----
         if not st.session_state.reward_created:
             c.execute(
                 "INSERT INTO rewards VALUES (NULL, ?, ?, ?, ?)",
