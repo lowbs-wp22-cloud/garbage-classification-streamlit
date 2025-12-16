@@ -10,7 +10,7 @@ import os
 # PAGE CONFIG
 # =============================
 st.set_page_config(
-    page_title="AI Garbage Classification",
+    page_title="AI Waste Classification",
     page_icon="♻️",
     layout="centered"
 )
@@ -37,24 +37,27 @@ def init_db():
 init_db()
 
 # =============================
-# LOAD MODEL (ONCE)
+# LOAD MODELS (ONCE)
 # =============================
-MODEL_PATH = "garbage_classifier.h5"
+GARBAGE_MODEL_PATH = "garbage_classifier.h5"
+FURNITURE_MODEL_PATH = "hcr_model.h5"
 
 @st.cache_resource
-def load_model():
-    if not os.path.exists(MODEL_PATH):
-        st.error(f"Model file not found at: {MODEL_PATH}")
-        st.stop()
-    return tf.keras.models.load_model(MODEL_PATH)
+def load_garbage_model():
+    return tf.keras.models.load_model(GARBAGE_MODEL_PATH)
 
-model = load_model()
+@st.cache_resource
+def load_furniture_model():
+    return tf.keras.models.load_model(FURNITURE_MODEL_PATH)
 
 # =============================
 # SESSION STATE
 # =============================
 if "user" not in st.session_state:
     st.session_state.user = None
+
+if "category" not in st.session_state:
+    st.session_state.category = None
 
 # =============================
 # AUTH FUNCTIONS
@@ -83,21 +86,19 @@ def login_user(email, password):
     return result and check_password_hash(result[0], password)
 
 # =============================
-# UI
+# UI HEADER
 # =============================
-st.title("♻️ AI Garbage Classification System")
-st.caption("Final Year Project – Streamlit Interface")
+st.title("♻️ AI Waste Classification System")
+st.caption("Final Year Project – Multi-Model Streamlit Application")
 
 # =============================
-# AUTH PAGES
+# LOGIN / SIGNUP
 # =============================
 if st.session_state.user is None:
     menu = st.sidebar.radio("Navigation", ["Login", "Sign Up"])
 
-    # ---------- LOGIN ----------
     if menu == "Login":
         st.subheader("🔐 Login")
-
         email = st.text_input("Email")
         password = st.text_input("Password", type="password")
 
@@ -109,32 +110,51 @@ if st.session_state.user is None:
             else:
                 st.error("Invalid email or password")
 
-    # ---------- SIGN UP ----------
     else:
         st.subheader("📝 Create Account")
-
         username = st.text_input("Username")
         email = st.text_input("Email")
         password = st.text_input("Password", type="password")
 
         if st.button("Sign Up"):
-            if not username or not email or not password:
-                st.warning("Please fill in all fields")
-            elif signup_user(username, email, password):
+            if signup_user(username, email, password):
                 st.success("Account created successfully. Please login.")
             else:
                 st.error("Email already exists")
 
 # =============================
+# CATEGORY SELECTION
+# =============================
+elif st.session_state.category is None:
+    st.success(f"Logged in as: {st.session_state.user}")
+    st.subheader("📂 Select Waste Category")
+
+    category = st.radio(
+        "Choose the category before uploading image:",
+        ("General Waste", "Furniture")
+    )
+
+    if st.button("Continue"):
+        st.session_state.category = category
+        st.rerun()
+
+# =============================
 # UPLOAD & AUTO-PREDICT
 # =============================
 else:
-    st.sidebar.success(f"Logged in as {st.session_state.user}")
-    if st.sidebar.button("Logout"):
-        st.session_state.user = None
+    st.sidebar.success(f"User: {st.session_state.user}")
+    st.sidebar.info(f"Category: {st.session_state.category}")
+
+    if st.sidebar.button("Change Category"):
+        st.session_state.category = None
         st.rerun()
 
-    st.subheader("📤 Upload Garbage Image")
+    if st.sidebar.button("Logout"):
+        st.session_state.user = None
+        st.session_state.category = None
+        st.rerun()
+
+    st.subheader("📤 Upload Image")
 
     uploaded_file = st.file_uploader(
         "Choose an image (JPG / PNG)",
@@ -142,27 +162,24 @@ else:
     )
 
     if uploaded_file:
-        # ---- DISPLAY IMAGE ----
         image = Image.open(uploaded_file).convert("RGB")
         st.image(image, caption="Uploaded Image", use_container_width=True)
 
-        # ---- AUTO PREDICTION ----
         with st.spinner("Analyzing image..."):
             img = image.resize((224, 224))
             img_array = np.array(img) / 255.0
             img_array = np.expand_dims(img_array, axis=0)
 
+            # -------- MODEL SELECTION --------
+            if st.session_state.category == "General Waste":
+                model = load_garbage_model()
+                labels = ["Paper", "Plastic", "Metal", "Glass", "Organic", "Trash"]
+            else:
+                model = load_furniture_model()
+                labels = ["Chair", "Table", "Sofa", "Bed", "Cabinet"]
+
             prediction = model.predict(img_array)
             class_index = np.argmax(prediction)
-
-            labels = ["Paper", "Plastic", "Metal", "Glass", "Organic", "Trash"]
             predicted_label = labels[class_index]
 
-            category = (
-                "Recyclable"
-                if predicted_label != "Trash"
-                else "Non-Recyclable"
-            )
-
-        st.success(f"♻️ Category: {category}")
-        st.info(f"📌 Details: {predicted_label}")
+        st.success(f"🧠 Prediction Result: {predicted_label}")
