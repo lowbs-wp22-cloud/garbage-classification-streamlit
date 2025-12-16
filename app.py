@@ -183,10 +183,10 @@ if st.session_state.user is None:
             if not username or not email or not password:
                 st.warning("Please fill in all fields")
             elif signup_user(username, email, password):
-                st.success("Account created successfully. Please login.")
-                st.session_state.auth_mode = "Login"
-            else:
-                st.error("Email already exists")
+                st.success("Account created successfully. Please switch to Login to continue.")
+        else:
+            st.error("Email already exists")
+
 
 # =============================
 # CATEGORY SELECTION
