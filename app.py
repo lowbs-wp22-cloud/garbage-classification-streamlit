@@ -16,7 +16,6 @@ def init_db():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
-    # USERS TABLE
     c.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,11 +26,12 @@ def init_db():
     )
     """)
 
-    # REWARDS TABLE (BASE)
     c.execute("""
     CREATE TABLE IF NOT EXISTS rewards (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_email TEXT,
+        category TEXT,
+        station TEXT,
         points INTEGER,
         status TEXT
     )
@@ -43,6 +43,8 @@ def init_db():
 
     if "category" not in columns:
         c.execute("ALTER TABLE rewards ADD COLUMN category TEXT")
+    if "station" not in columns:
+        c.execute("ALTER TABLE rewards ADD COLUMN station TEXT")
 
     conn.commit()
     conn.close()
@@ -52,12 +54,14 @@ init_db()
 # -----------------------
 # SESSION STATE
 # -----------------------
-if "user" not in st.session_state:
-    st.session_state.user = None
-if "user_role" not in st.session_state:
-    st.session_state.user_role = None
-if "login_type" not in st.session_state:
-    st.session_state.login_type = "User"
+for key in [
+    "user", "user_role", "login_type",
+    "prediction_done", "selected_station"
+]:
+    if key not in st.session_state:
+        st.session_state[key] = None
+
+st.session_state.login_type = st.session_state.login_type or "User"
 
 # -----------------------
 # AUTH FUNCTIONS
@@ -89,7 +93,7 @@ def login_user(email, password, role):
     return row and check_password_hash(row[0], password)
 
 # -----------------------
-# SIMULATED AI PREDICTION
+# AI PREDICTION (SIMULATED)
 # -----------------------
 def predict_garbage(category):
     if category == "General Waste":
@@ -97,7 +101,7 @@ def predict_garbage(category):
     else:
         classes = ["Chair", "Table", "Sofa", "Cabinet"]
 
-    return random.choice(classes), round(random.uniform(0.75, 0.99), 2)
+    return random.choice(classes), round(random.uniform(0.8, 0.99), 2)
 
 # -----------------------
 # SIDEBAR
@@ -107,8 +111,8 @@ st.sidebar.title("♻️ Garbage Classification System")
 if st.session_state.user:
     st.sidebar.success(f"Logged in as {st.session_state.user_role.upper()}")
     if st.sidebar.button("Logout"):
-        st.session_state.user = None
-        st.session_state.user_role = None
+        for key in st.session_state:
+            st.session_state[key] = None
         st.rerun()
 
 # -----------------------
@@ -151,6 +155,7 @@ if not st.session_state.user:
 elif st.session_state.user_role == "user":
     st.title("👤 User Dashboard")
 
+    # STEP 1: CATEGORY
     st.subheader("🗂 Select Garbage Category")
     category = st.radio(
         "Choose category:",
@@ -158,34 +163,64 @@ elif st.session_state.user_role == "user":
         horizontal=True
     )
 
-    uploaded_file = st.file_uploader("Upload image", type=["jpg", "png", "jpeg"])
+    # STEP 2: IMAGE UPLOAD
+    st.subheader("📷 Upload Image")
+    uploaded_file = st.file_uploader(
+        "Upload garbage image",
+        type=["jpg", "jpeg", "png"]
+    )
 
     if uploaded_file:
         st.image(uploaded_file, use_column_width=True)
 
         prediction, confidence = predict_garbage(category)
+
+        st.subheader("🧠 Prediction Result")
         st.success(f"Predicted Class: {prediction}")
         st.info(f"Confidence: {confidence * 100:.0f}%")
 
-        if st.button("Submit Garbage"):
+        st.session_state.prediction_done = True
+
+    # STEP 3: CHOOSE DELIVERY STATION
+    if st.session_state.prediction_done:
+        st.subheader("🚚 Choose Delivery Station")
+
+        st.session_state.selected_station = st.radio(
+            "Select a station:",
+            [
+                "Station A – City Recycling Center",
+                "Station B – Community Drop-off Point",
+                "Station C – Furniture Collection Hub"
+            ]
+        )
+
+        if st.button("Confirm Delivery Station"):
             conn = sqlite3.connect(DB_PATH)
             c = conn.cursor()
-            c.execute(
-                "INSERT INTO rewards (user_email, category, points, status) VALUES (?, ?, ?, ?)",
-                (st.session_state.user, category, 10, "PENDING")
-            )
+            c.execute("""
+                INSERT INTO rewards (user_email, category, station, points, status)
+                VALUES (?, ?, ?, ?, ?)
+            """, (
+                st.session_state.user,
+                category,
+                st.session_state.selected_station,
+                10,
+                "PENDING"
+            ))
             conn.commit()
             conn.close()
-            st.success("Submitted! Pending admin approval.")
+
+            st.success("Delivery station selected. Reward status: PENDING")
+            st.session_state.prediction_done = False
             st.rerun()
 
-    # ---- REWARD STATUS (FIXED) ----
+    # STEP 4: REWARD STATUS
     st.subheader("🎁 Reward Status")
 
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
-        SELECT id, category, points, status
+        SELECT category, station, points, status
         FROM rewards
         WHERE user_email=?
         ORDER BY id DESC
@@ -196,8 +231,11 @@ elif st.session_state.user_role == "user":
     if not rewards:
         st.info("No rewards yet")
 
-    for rid, cat, points, status in rewards:
-        st.write(f"{cat} | {points} points | {status}")
+    for cat, station, points, status in rewards:
+        st.write(
+            f"Category: {cat} | Station: {station} | "
+            f"Points: {points} | Status: [{status}]"
+        )
 
 # -----------------------
 # ADMIN DASHBOARD
@@ -208,7 +246,7 @@ elif st.session_state.user_role == "admin":
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
-        SELECT id, user_email, category, points
+        SELECT id, user_email, category, station, points
         FROM rewards
         WHERE status='PENDING'
     """)
@@ -218,13 +256,15 @@ elif st.session_state.user_role == "admin":
     if not rewards:
         st.info("No pending rewards")
 
-    for rid, email, category, points in rewards:
-        col1, col2, col3, col4 = st.columns(4)
+    for rid, email, cat, station, points in rewards:
+        col1, col2, col3, col4, col5, col6 = st.columns(6)
         col1.write(email)
-        col2.write(category)
-        col3.write(points)
+        col2.write(cat)
+        col3.write(station)
+        col4.write(points)
+        col5.write("PENDING")
 
-        if col4.button("Approve", key=rid):
+        if col6.button("Approve", key=f"approve_{rid}"):
             conn = sqlite3.connect(DB_PATH)
             c = conn.cursor()
             c.execute(
