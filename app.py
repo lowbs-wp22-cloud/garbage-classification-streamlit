@@ -3,15 +3,15 @@ import sqlite3
 import random
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# -----------------------
+# =====================================================
 # CONFIG
-# -----------------------
+# =====================================================
 DB_PATH = "garbage_app.db"
 st.set_page_config(page_title="Garbage Classification System", layout="wide")
 
-# -----------------------
+# =====================================================
 # DATABASE INIT + MIGRATION
-# -----------------------
+# =====================================================
 def init_db():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -37,7 +37,6 @@ def init_db():
     )
     """)
 
-    # ---- AUTO MIGRATION ----
     c.execute("PRAGMA table_info(rewards)")
     columns = [col[1] for col in c.fetchall()]
 
@@ -51,21 +50,26 @@ def init_db():
 
 init_db()
 
-# -----------------------
-# SESSION STATE
-# -----------------------
-for key in [
-    "user", "user_role", "login_type",
-    "prediction_done", "selected_station"
-]:
-    if key not in st.session_state:
-        st.session_state[key] = None
+# =====================================================
+# SESSION STATE INIT
+# =====================================================
+defaults = {
+    "user": None,
+    "user_role": None,
+    "login_type": "User",
+    "page": "upload",          # upload | station
+    "category": None,
+    "prediction": None,
+    "confidence": None
+}
 
-st.session_state.login_type = st.session_state.login_type or "User"
+for k, v in defaults.items():
+    if k not in st.session_state:
+        st.session_state[k] = v
 
-# -----------------------
+# =====================================================
 # AUTH FUNCTIONS
-# -----------------------
+# =====================================================
 def signup_user(username, email, password, role):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -92,9 +96,9 @@ def login_user(email, password, role):
     conn.close()
     return row and check_password_hash(row[0], password)
 
-# -----------------------
-# AI PREDICTION (SIMULATED)
-# -----------------------
+# =====================================================
+# SIMULATED AI PREDICTION
+# =====================================================
 def predict_garbage(category):
     if category == "General Waste":
         classes = ["Plastic", "Paper", "Metal", "Organic Waste"]
@@ -103,21 +107,21 @@ def predict_garbage(category):
 
     return random.choice(classes), round(random.uniform(0.8, 0.99), 2)
 
-# -----------------------
+# =====================================================
 # SIDEBAR
-# -----------------------
+# =====================================================
 st.sidebar.title("♻️ Garbage Classification System")
 
 if st.session_state.user:
     st.sidebar.success(f"Logged in as {st.session_state.user_role.upper()}")
     if st.sidebar.button("Logout"):
-        for key in st.session_state:
-            st.session_state[key] = None
+        for k in st.session_state:
+            st.session_state[k] = None
         st.rerun()
 
-# -----------------------
+# =====================================================
 # LOGIN / SIGNUP
-# -----------------------
+# =====================================================
 if not st.session_state.user:
     st.title("🔐 Login / Signup")
 
@@ -149,44 +153,49 @@ if not st.session_state.user:
             else:
                 st.error("Email already exists")
 
-# -----------------------
+# =====================================================
 # USER DASHBOARD
-# -----------------------
+# =====================================================
 elif st.session_state.user_role == "user":
-    st.title("👤 User Dashboard")
 
-    # STEP 1: CATEGORY
-    st.subheader("🗂 Select Garbage Category")
-    category = st.radio(
-        "Choose category:",
-        ["General Waste", "Furniture"],
-        horizontal=True
-    )
+    # ================= UPLOAD PAGE =================
+    if st.session_state.page == "upload":
+        st.title("👤 User Dashboard")
 
-    # STEP 2: IMAGE UPLOAD
-    st.subheader("📷 Upload Image")
-    uploaded_file = st.file_uploader(
-        "Upload garbage image",
-        type=["jpg", "jpeg", "png"]
-    )
+        st.subheader("🗂 Select Garbage Category")
+        st.session_state.category = st.radio(
+            "Choose category:",
+            ["General Waste", "Furniture"],
+            horizontal=True
+        )
 
-    if uploaded_file:
-        st.image(uploaded_file, use_column_width=True)
+        st.subheader("📷 Upload Image")
+        uploaded_file = st.file_uploader(
+            "Upload garbage image",
+            type=["jpg", "jpeg", "png"]
+        )
 
-        prediction, confidence = predict_garbage(category)
+        if uploaded_file:
+            st.image(uploaded_file, use_column_width=True)
 
-        st.subheader("🧠 Prediction Result")
-        st.success(f"Predicted Class: {prediction}")
-        st.info(f"Confidence: {confidence * 100:.0f}%")
+            prediction, confidence = predict_garbage(st.session_state.category)
+            st.session_state.prediction = prediction
+            st.session_state.confidence = confidence
 
-        st.session_state.prediction_done = True
+            st.subheader("🧠 Prediction Result")
+            st.success(f"Predicted Class: {prediction}")
+            st.info(f"Confidence: {confidence * 100:.0f}%")
 
-    # STEP 3: CHOOSE DELIVERY STATION
-    if st.session_state.prediction_done:
-        st.subheader("🚚 Choose Delivery Station")
+            if st.button("🚚 Choose Delivery Station"):
+                st.session_state.page = "station"
+                st.rerun()
 
-        st.session_state.selected_station = st.radio(
-            "Select a station:",
+    # ================= STATION PAGE =================
+    elif st.session_state.page == "station":
+        st.title("🚚 Delivery Station Selection")
+
+        station = st.radio(
+            "Select a delivery station:",
             [
                 "Station A – City Recycling Center",
                 "Station B – Community Drop-off Point",
@@ -194,27 +203,43 @@ elif st.session_state.user_role == "user":
             ]
         )
 
-        if st.button("Confirm Delivery Station"):
-            conn = sqlite3.connect(DB_PATH)
-            c = conn.cursor()
-            c.execute("""
-                INSERT INTO rewards (user_email, category, station, points, status)
-                VALUES (?, ?, ?, ?, ?)
-            """, (
-                st.session_state.user,
-                category,
-                st.session_state.selected_station,
-                10,
-                "PENDING"
-            ))
-            conn.commit()
-            conn.close()
+        col1, col2 = st.columns(2)
 
-            st.success("Delivery station selected. Reward status: PENDING")
-            st.session_state.prediction_done = False
-            st.rerun()
+        with col1:
+            if st.button("⬅ Back"):
+                st.session_state.page = "upload"
+                st.rerun()
 
-    # STEP 4: REWARD STATUS
+        with col2:
+            if st.button("✅ Confirm Station"):
+                conn = sqlite3.connect(DB_PATH)
+                c = conn.cursor()
+                c.execute("""
+                    INSERT INTO rewards (user_email, category, station, points, status)
+                    VALUES (?, ?, ?, ?, ?)
+                """, (
+                    st.session_state.user,
+                    st.session_state.category,
+                    station,
+                    10,
+                    "PENDING"
+                ))
+                conn.commit()
+                conn.close()
+
+                st.success("Delivery station confirmed. Reward status: [PENDING]")
+                st.session_state.page = "upload"
+                st.rerun()
+
+        st.divider()
+
+        st.subheader("🧠 Prediction Summary")
+        st.write(f"Category: {st.session_state.category}")
+        st.write(f"Predicted Class: {st.session_state.prediction}")
+        st.write(f"Confidence: {st.session_state.confidence * 100:.0f}%")
+
+    # ================= REWARD STATUS =================
+    st.divider()
     st.subheader("🎁 Reward Status")
 
     conn = sqlite3.connect(DB_PATH)
@@ -237,9 +262,9 @@ elif st.session_state.user_role == "user":
             f"Points: {points} | Status: [{status}]"
         )
 
-# -----------------------
+# =====================================================
 # ADMIN DASHBOARD
-# -----------------------
+# =====================================================
 elif st.session_state.user_role == "admin":
     st.title("🛠 Admin Dashboard")
 
