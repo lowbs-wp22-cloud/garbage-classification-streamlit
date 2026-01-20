@@ -6,7 +6,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 # CONFIG
 # -----------------------
 DB_PATH = "garbage_app.db"
-
 st.set_page_config(page_title="Garbage Classification System", layout="wide")
 
 # -----------------------
@@ -82,7 +81,7 @@ def login_user(email, password, role):
 # -----------------------
 # SIDEBAR
 # -----------------------
-st.sidebar.title("♻️ Garbage Classification")
+st.sidebar.title("♻️ Garbage Classification System")
 
 if st.session_state.user:
     st.sidebar.success(f"Logged in as {st.session_state.user_role.upper()}")
@@ -92,7 +91,7 @@ if st.session_state.user:
         st.rerun()
 
 # -----------------------
-# LOGIN / SIGNUP PAGE
+# LOGIN / SIGNUP
 # -----------------------
 if not st.session_state.user:
     st.title("🔐 Login / Signup")
@@ -105,11 +104,13 @@ if not st.session_state.user:
     )
 
     role = st.session_state.login_type.lower()
-    tab1, tab2 = st.tabs(["Login", "Sign Up"])
+    login_tab, signup_tab = st.tabs(["Login", "Sign Up"])
 
-    with tab1:
-        email = st.text_input("Email")
-        password = st.text_input("Password", type="password")
+    # ---------- LOGIN ----------
+    with login_tab:
+        email = st.text_input("Email", key="login_email")
+        password = st.text_input("Password", type="password", key="login_pass")
+
         if st.button("Login"):
             if login_user(email, password, role):
                 st.session_state.user = email
@@ -117,15 +118,21 @@ if not st.session_state.user:
                 st.success("Login successful")
                 st.rerun()
             else:
-                st.error("Invalid credentials")
+                st.error("Invalid email, password, or role")
 
-    with tab2:
+    # ---------- SIGNUP ----------
+    with signup_tab:
         username = st.text_input("Username")
         email = st.text_input("Email", key="signup_email")
         password = st.text_input("Password", type="password", key="signup_pass")
+
         if st.button("Sign Up"):
             if signup_user(username, email, password, role):
-                st.success("Account created. Please login.")
+                # ✅ AUTO LOGIN AFTER SIGNUP (FIX)
+                st.session_state.user = email
+                st.session_state.user_role = role
+                st.success("Account created successfully!")
+                st.rerun()
             else:
                 st.error("Email already exists")
 
@@ -136,7 +143,7 @@ elif st.session_state.user_role == "user":
     st.title("👤 User Dashboard")
 
     st.subheader("📷 Garbage Classification (Demo)")
-    st.info("Pretend AI model classifies garbage here")
+    st.info("AI model classifies garbage here (demo placeholder)")
 
     if st.button("Submit Garbage"):
         conn = sqlite3.connect(DB_PATH)
@@ -147,7 +154,7 @@ elif st.session_state.user_role == "user":
         )
         conn.commit()
         conn.close()
-        st.success("Garbage submitted! Reward pending admin approval.")
+        st.success("Submission successful! Reward pending admin approval.")
 
     st.subheader("🎁 Reward Status")
 
@@ -161,18 +168,20 @@ elif st.session_state.user_role == "user":
     """, (st.session_state.user,))
     rewards = c.fetchall()
 
+    if not rewards:
+        st.info("No rewards yet")
+
     for rid, points, status in rewards:
         st.write(f"Points: {points} | Status: {status}")
 
         if status == "APPROVED":
             if st.button("🎉 Claim Reward", key=f"claim_{rid}"):
-                c.execute("""
-                    UPDATE rewards
-                    SET status='EARNED'
-                    WHERE id=?
-                """, (rid,))
+                c.execute(
+                    "UPDATE rewards SET status='EARNED' WHERE id=?",
+                    (rid,)
+                )
                 conn.commit()
-                st.success("Reward claimed!")
+                st.success("Reward claimed successfully!")
                 st.rerun()
 
     conn.close()
@@ -188,7 +197,7 @@ elif st.session_state.user_role == "admin":
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
-        SELECT id, user_email, points, status
+        SELECT id, user_email, points
         FROM rewards
         WHERE status='PENDING'
     """)
@@ -197,20 +206,19 @@ elif st.session_state.user_role == "admin":
     if not rewards:
         st.info("No pending rewards")
 
-    for rid, email, points, status in rewards:
+    for rid, email, points in rewards:
         col1, col2, col3, col4 = st.columns(4)
         col1.write(email)
         col2.write(points)
-        col3.write(status)
+        col3.write("PENDING")
 
         if col4.button("Approve", key=f"approve_{rid}"):
-            c.execute("""
-                UPDATE rewards
-                SET status='APPROVED'
-                WHERE id=?
-            """, (rid,))
+            c.execute(
+                "UPDATE rewards SET status='APPROVED' WHERE id=?",
+                (rid,)
+            )
             conn.commit()
-            st.success("Reward approved")
+            st.success("Reward approved!")
             st.rerun()
 
     conn.close()
