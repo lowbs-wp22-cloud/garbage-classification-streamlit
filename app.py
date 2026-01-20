@@ -57,7 +57,7 @@ defaults = {
     "user": None,
     "user_role": None,
     "login_type": "User",
-    "page": "upload",          # upload | station
+    "page": "upload",        # upload | station
     "category": None,
     "prediction": None,
     "confidence": None
@@ -158,7 +158,7 @@ if not st.session_state.user:
 # =====================================================
 elif st.session_state.user_role == "user":
 
-    # ================= UPLOAD PAGE =================
+    # ---------------- UPLOAD PAGE ----------------
     if st.session_state.page == "upload":
         st.title("👤 User Dashboard")
 
@@ -190,7 +190,7 @@ elif st.session_state.user_role == "user":
                 st.session_state.page = "station"
                 st.rerun()
 
-    # ================= STATION PAGE =================
+    # ---------------- STATION PAGE ----------------
     elif st.session_state.page == "station":
         st.title("🚚 Delivery Station Selection")
 
@@ -202,6 +202,13 @@ elif st.session_state.user_role == "user":
                 "Station C – Furniture Collection Hub"
             ]
         )
+
+        st.divider()
+
+        # ✅ REWARD SHOWN ONLY HERE
+        st.subheader("🎁 Reward Preview")
+        st.success("You will receive **10 reward points** after admin approval.")
+        st.info("Current Status: [PENDING]")
 
         col1, col2 = st.columns(2)
 
@@ -227,18 +234,18 @@ elif st.session_state.user_role == "user":
                 conn.commit()
                 conn.close()
 
-                st.success("Delivery station confirmed. Reward status: [PENDING]")
+                st.success("Delivery station confirmed. Reward is now [PENDING].")
                 st.session_state.page = "upload"
                 st.rerun()
 
         st.divider()
+        st.caption(
+            f"Category: {st.session_state.category} | "
+            f"Prediction: {st.session_state.prediction} | "
+            f"Confidence: {st.session_state.confidence * 100:.0f}%"
+        )
 
-        st.subheader("🧠 Prediction Summary")
-        st.write(f"Category: {st.session_state.category}")
-        st.write(f"Predicted Class: {st.session_state.prediction}")
-        st.write(f"Confidence: {st.session_state.confidence * 100:.0f}%")
-
-    # ================= REWARD STATUS =================
+    # ---------------- REWARD STATUS ----------------
     st.divider()
     st.subheader("🎁 Reward Status")
 
