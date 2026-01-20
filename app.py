@@ -1,5 +1,6 @@
 import streamlit as st
 import sqlite3
+import random
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # -----------------------
@@ -80,6 +81,24 @@ def login_user(email, password, role):
     return row and check_password_hash(row[0], password)
 
 # -----------------------
+# SIMULATED AI PREDICTION
+# -----------------------
+def predict_garbage(category, filename):
+    """
+    Fake AI prediction (FYP-friendly).
+    Replace this with a real ML model later.
+    """
+    if category == "General Waste":
+        classes = ["Plastic", "Paper", "Metal", "Organic Waste"]
+    else:
+        classes = ["Chair", "Table", "Sofa", "Cabinet"]
+
+    prediction = random.choice(classes)
+    confidence = round(random.uniform(0.75, 0.99), 2)
+
+    return prediction, confidence
+
+# -----------------------
 # SIDEBAR
 # -----------------------
 st.sidebar.title("♻️ Garbage Classification System")
@@ -92,7 +111,7 @@ if st.session_state.user:
         st.rerun()
 
 # -----------------------
-# LOGIN / SIGNUP PAGE
+# LOGIN / SIGNUP
 # -----------------------
 if not st.session_state.user:
     st.title("🔐 Login / Signup")
@@ -107,7 +126,6 @@ if not st.session_state.user:
     role = st.session_state.login_type.lower()
     login_tab, signup_tab = st.tabs(["Login", "Sign Up"])
 
-    # LOGIN
     with login_tab:
         email = st.text_input("Email", key="login_email")
         password = st.text_input("Password", type="password", key="login_pass")
@@ -121,7 +139,6 @@ if not st.session_state.user:
             else:
                 st.error("Invalid email, password, or role")
 
-    # SIGNUP
     with signup_tab:
         username = st.text_input("Username")
         email = st.text_input("Email", key="signup_email")
@@ -142,11 +159,10 @@ if not st.session_state.user:
 elif st.session_state.user_role == "user":
     st.title("👤 User Dashboard")
 
-    # STEP 1: CATEGORY SELECTION
+    # STEP 1: CATEGORY
     st.subheader("🗂 Select Garbage Category")
-
     category = st.radio(
-        "Choose garbage type before uploading:",
+        "Choose garbage type:",
         ["General Waste", "Furniture"],
         horizontal=True
     )
@@ -155,15 +171,27 @@ elif st.session_state.user_role == "user":
 
     # STEP 2: IMAGE UPLOAD
     st.subheader("📷 Upload Garbage Image")
-
     uploaded_file = st.file_uploader(
         f"Upload {category} image",
         type=["jpg", "jpeg", "png"]
     )
 
     if uploaded_file:
-        st.image(uploaded_file, caption=f"{category} Image", use_column_width=True)
-        st.info("AI garbage classification model runs here (demo placeholder)")
+        st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
+
+        # 🔥 PREDICTION SHOWN HERE
+        predicted_class, confidence = predict_garbage(
+            category, uploaded_file.name
+        )
+
+        st.subheader("🧠 AI Prediction Result")
+        st.success(f"**Predicted Class:** {predicted_class}")
+        st.info(f"**Confidence Score:** {confidence * 100:.0f}%")
+
+        st.caption(
+            "Prediction is generated using a simulated AI model "
+            "(for demonstration purposes in this project)."
+        )
 
         if st.button("Submit Garbage"):
             conn = sqlite3.connect(DB_PATH)
@@ -176,7 +204,7 @@ elif st.session_state.user_role == "user":
             conn.close()
 
             st.success(
-                f"{category} submitted successfully! Reward pending admin approval."
+                "Garbage submitted successfully. Reward pending admin approval."
             )
             st.rerun()
 
