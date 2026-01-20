@@ -10,12 +10,13 @@ DB_PATH = "garbage_app.db"
 st.set_page_config(page_title="Garbage Classification System", layout="wide")
 
 # -----------------------
-# DATABASE INIT
+# DATABASE INIT + MIGRATION
 # -----------------------
 def init_db():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
+    # USERS TABLE
     c.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,15 +27,22 @@ def init_db():
     )
     """)
 
+    # REWARDS TABLE (BASE)
     c.execute("""
     CREATE TABLE IF NOT EXISTS rewards (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_email TEXT,
-        category TEXT,
         points INTEGER,
         status TEXT
     )
     """)
+
+    # ---- AUTO MIGRATION ----
+    c.execute("PRAGMA table_info(rewards)")
+    columns = [col[1] for col in c.fetchall()]
+
+    if "category" not in columns:
+        c.execute("ALTER TABLE rewards ADD COLUMN category TEXT")
 
     conn.commit()
     conn.close()
@@ -83,20 +91,13 @@ def login_user(email, password, role):
 # -----------------------
 # SIMULATED AI PREDICTION
 # -----------------------
-def predict_garbage(category, filename):
-    """
-    Fake AI prediction (FYP-friendly).
-    Replace this with a real ML model later.
-    """
+def predict_garbage(category):
     if category == "General Waste":
         classes = ["Plastic", "Paper", "Metal", "Organic Waste"]
     else:
         classes = ["Chair", "Table", "Sofa", "Cabinet"]
 
-    prediction = random.choice(classes)
-    confidence = round(random.uniform(0.75, 0.99), 2)
-
-    return prediction, confidence
+    return random.choice(classes), round(random.uniform(0.75, 0.99), 2)
 
 # -----------------------
 # SIDEBAR
@@ -116,39 +117,30 @@ if st.session_state.user:
 if not st.session_state.user:
     st.title("🔐 Login / Signup")
 
-    st.radio(
-        "Login as:",
-        ["User", "Admin"],
-        horizontal=True,
-        key="login_type"
-    )
-
+    st.radio("Login as:", ["User", "Admin"], horizontal=True, key="login_type")
     role = st.session_state.login_type.lower()
+
     login_tab, signup_tab = st.tabs(["Login", "Sign Up"])
 
     with login_tab:
-        email = st.text_input("Email", key="login_email")
-        password = st.text_input("Password", type="password", key="login_pass")
-
+        email = st.text_input("Email")
+        password = st.text_input("Password", type="password")
         if st.button("Login"):
             if login_user(email, password, role):
                 st.session_state.user = email
                 st.session_state.user_role = role
-                st.success("Login successful")
                 st.rerun()
             else:
-                st.error("Invalid email, password, or role")
+                st.error("Invalid credentials")
 
     with signup_tab:
         username = st.text_input("Username")
         email = st.text_input("Email", key="signup_email")
         password = st.text_input("Password", type="password", key="signup_pass")
-
         if st.button("Sign Up"):
             if signup_user(username, email, password, role):
                 st.session_state.user = email
                 st.session_state.user_role = role
-                st.success("Account created and logged in!")
                 st.rerun()
             else:
                 st.error("Email already exists")
@@ -159,39 +151,21 @@ if not st.session_state.user:
 elif st.session_state.user_role == "user":
     st.title("👤 User Dashboard")
 
-    # STEP 1: CATEGORY
     st.subheader("🗂 Select Garbage Category")
     category = st.radio(
-        "Choose garbage type:",
+        "Choose category:",
         ["General Waste", "Furniture"],
         horizontal=True
     )
 
-    st.divider()
-
-    # STEP 2: IMAGE UPLOAD
-    st.subheader("📷 Upload Garbage Image")
-    uploaded_file = st.file_uploader(
-        f"Upload {category} image",
-        type=["jpg", "jpeg", "png"]
-    )
+    uploaded_file = st.file_uploader("Upload image", type=["jpg", "png", "jpeg"])
 
     if uploaded_file:
-        st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
+        st.image(uploaded_file, use_column_width=True)
 
-        # 🔥 PREDICTION SHOWN HERE
-        predicted_class, confidence = predict_garbage(
-            category, uploaded_file.name
-        )
-
-        st.subheader("🧠 AI Prediction Result")
-        st.success(f"**Predicted Class:** {predicted_class}")
-        st.info(f"**Confidence Score:** {confidence * 100:.0f}%")
-
-        st.caption(
-            "Prediction is generated using a simulated AI model "
-            "(for demonstration purposes in this project)."
-        )
+        prediction, confidence = predict_garbage(category)
+        st.success(f"Predicted Class: {prediction}")
+        st.info(f"Confidence: {confidence * 100:.0f}%")
 
         if st.button("Submit Garbage"):
             conn = sqlite3.connect(DB_PATH)
@@ -202,13 +176,10 @@ elif st.session_state.user_role == "user":
             )
             conn.commit()
             conn.close()
-
-            st.success(
-                "Garbage submitted successfully. Reward pending admin approval."
-            )
+            st.success("Submitted! Pending admin approval.")
             st.rerun()
 
-    # STEP 3: REWARD STATUS
+    # ---- REWARD STATUS (FIXED) ----
     st.subheader("🎁 Reward Status")
 
     conn = sqlite3.connect(DB_PATH)
@@ -220,32 +191,19 @@ elif st.session_state.user_role == "user":
         ORDER BY id DESC
     """, (st.session_state.user,))
     rewards = c.fetchall()
+    conn.close()
 
     if not rewards:
         st.info("No rewards yet")
 
     for rid, cat, points, status in rewards:
-        st.write(f"Category: {cat} | Points: {points} | Status: {status}")
-
-        if status == "APPROVED":
-            if st.button("🎉 Claim Reward", key=f"claim_{rid}"):
-                c.execute(
-                    "UPDATE rewards SET status='EARNED' WHERE id=?",
-                    (rid,)
-                )
-                conn.commit()
-                st.success("Reward claimed successfully!")
-                st.rerun()
-
-    conn.close()
+        st.write(f"{cat} | {points} points | {status}")
 
 # -----------------------
 # ADMIN DASHBOARD
 # -----------------------
 elif st.session_state.user_role == "admin":
     st.title("🛠 Admin Dashboard")
-
-    st.subheader("📋 Pending Reward Approvals")
 
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -255,24 +213,25 @@ elif st.session_state.user_role == "admin":
         WHERE status='PENDING'
     """)
     rewards = c.fetchall()
+    conn.close()
 
     if not rewards:
         st.info("No pending rewards")
 
     for rid, email, category, points in rewards:
-        col1, col2, col3, col4, col5 = st.columns(5)
+        col1, col2, col3, col4 = st.columns(4)
         col1.write(email)
         col2.write(category)
         col3.write(points)
-        col4.write("PENDING")
 
-        if col5.button("Approve", key=f"approve_{rid}"):
+        if col4.button("Approve", key=rid):
+            conn = sqlite3.connect(DB_PATH)
+            c = conn.cursor()
             c.execute(
                 "UPDATE rewards SET status='APPROVED' WHERE id=?",
                 (rid,)
             )
             conn.commit()
+            conn.close()
             st.success("Reward approved!")
             st.rerun()
-
-    conn.close()
