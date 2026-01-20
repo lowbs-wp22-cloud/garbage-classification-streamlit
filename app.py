@@ -58,6 +58,7 @@ defaults = {
     "user_role": None,
     "login_type": "User",
     "page": "upload",        # upload | station
+    "nav": "User Profile",   # sidebar navigation
     "category": None,
     "prediction": None,
     "confidence": None
@@ -110,10 +111,16 @@ def predict_garbage(category):
 # =====================================================
 # SIDEBAR
 # =====================================================
-st.sidebar.title("♻️ Garbage Classification System")
+st.sidebar.title("♻️ Garbage Classification")
 
 if st.session_state.user:
     st.sidebar.success(f"Logged in as {st.session_state.user_role.upper()}")
+
+    st.session_state.nav = st.sidebar.radio(
+        "Navigation",
+        ["User Profile", "Upload Garbage", "Reward History"]
+    )
+
     if st.sidebar.button("Logout"):
         for k in st.session_state:
             st.session_state[k] = None
@@ -158,66 +165,57 @@ if not st.session_state.user:
 # =====================================================
 elif st.session_state.user_role == "user":
 
-    # ---------------- UPLOAD PAGE ----------------
-    if st.session_state.page == "upload":
-        st.title("👤 User Dashboard")
+    # ---------------- USER PROFILE ----------------
+    if st.session_state.nav == "User Profile":
+        st.title("👤 User Profile")
+        st.write(f"**Email:** {st.session_state.user}")
+        st.write("**Role:** User")
+        st.info("Welcome to the Garbage Classification & Reward System")
 
-        st.subheader("🗂 Select Garbage Category")
-        st.session_state.category = st.radio(
+    # ---------------- UPLOAD GARBAGE ----------------
+    elif st.session_state.nav == "Upload Garbage":
+        st.title("📷 Upload Garbage")
+
+        st.subheader("🗂 Select Category")
+        category = st.radio(
             "Choose category:",
             ["General Waste", "Furniture"],
             horizontal=True
         )
 
-        st.subheader("📷 Upload Image")
         uploaded_file = st.file_uploader(
-            "Upload garbage image",
+            "Upload image",
             type=["jpg", "jpeg", "png"]
         )
 
         if uploaded_file:
             st.image(uploaded_file, use_column_width=True)
 
-            prediction, confidence = predict_garbage(st.session_state.category)
-            st.session_state.prediction = prediction
-            st.session_state.confidence = confidence
+            prediction, confidence = predict_garbage(category)
 
             st.subheader("🧠 Prediction Result")
             st.success(f"Predicted Class: {prediction}")
             st.info(f"Confidence: {confidence * 100:.0f}%")
 
             if st.button("🚚 Choose Delivery Station"):
+                st.session_state.category = category
                 st.session_state.page = "station"
                 st.rerun()
 
-    # ---------------- STATION PAGE ----------------
-    elif st.session_state.page == "station":
-        st.title("🚚 Delivery Station Selection")
+        if st.session_state.page == "station":
+            st.subheader("🚚 Delivery Station")
 
-        station = st.radio(
-            "Select a delivery station:",
-            [
-                "Station A – City Recycling Center",
-                "Station B – Community Drop-off Point",
-                "Station C – Furniture Collection Hub"
-            ]
-        )
+            station = st.radio(
+                "Select station:",
+                [
+                    "Station A – City Recycling Center",
+                    "Station B – Community Drop-off Point",
+                    "Station C – Furniture Collection Hub"
+                ]
+            )
 
-        st.divider()
+            st.success("🎁 Reward Preview: 10 points (Status: PENDING)")
 
-        # ✅ REWARD SHOWN ONLY HERE
-        st.subheader("🎁 Reward Preview")
-        st.success("You will receive **10 reward points** after admin approval.")
-        st.info("Current Status: [PENDING]")
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            if st.button("⬅ Back"):
-                st.session_state.page = "upload"
-                st.rerun()
-
-        with col2:
             if st.button("✅ Confirm Station"):
                 conn = sqlite3.connect(DB_PATH)
                 c = conn.cursor()
@@ -234,40 +232,37 @@ elif st.session_state.user_role == "user":
                 conn.commit()
                 conn.close()
 
-                st.success("Delivery station confirmed. Reward is now [PENDING].")
                 st.session_state.page = "upload"
+                st.success("Delivery confirmed. Reward pending admin approval.")
                 st.rerun()
 
-        st.divider()
-        st.caption(
-            f"Category: {st.session_state.category} | "
-            f"Prediction: {st.session_state.prediction} | "
-            f"Confidence: {st.session_state.confidence * 100:.0f}%"
-        )
+    # ---------------- REWARD HISTORY ----------------
+    elif st.session_state.nav == "Reward History":
+        st.title("🎁 Reward History")
 
-    # ---------------- REWARD STATUS ----------------
-    st.divider()
-    st.subheader("🎁 Reward Status")
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("""
+            SELECT category, station, points, status
+            FROM rewards
+            WHERE user_email=?
+              AND category IS NOT NULL
+              AND station IS NOT NULL
+            ORDER BY id DESC
+        """, (st.session_state.user,))
+        rewards = c.fetchall()
+        conn.close()
 
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("""
-        SELECT category, station, points, status
-        FROM rewards
-        WHERE user_email=?
-        ORDER BY id DESC
-    """, (st.session_state.user,))
-    rewards = c.fetchall()
-    conn.close()
+        if not rewards:
+            st.info("No valid rewards yet")
 
-    if not rewards:
-        st.info("No rewards yet")
-
-    for cat, station, points, status in rewards:
-        st.write(
-            f"Category: {cat} | Station: {station} | "
-            f"Points: {points} | Status: [{status}]"
-        )
+        for cat, station, points, status in rewards:
+            st.write(
+                f"Category: {cat} | "
+                f"Station: {station} | "
+                f"Points: {points} | "
+                f"Status: [{status}]"
+            )
 
 # =====================================================
 # ADMIN DASHBOARD
@@ -281,6 +276,8 @@ elif st.session_state.user_role == "admin":
         SELECT id, user_email, category, station, points
         FROM rewards
         WHERE status='PENDING'
+          AND category IS NOT NULL
+          AND station IS NOT NULL
     """)
     rewards = c.fetchall()
     conn.close()
