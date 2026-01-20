@@ -29,6 +29,7 @@ def init_db():
     CREATE TABLE IF NOT EXISTS rewards (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_email TEXT,
+        category TEXT,
         points INTEGER,
         status TEXT
     )
@@ -91,7 +92,7 @@ if st.session_state.user:
         st.rerun()
 
 # -----------------------
-# LOGIN / SIGNUP
+# LOGIN / SIGNUP PAGE
 # -----------------------
 if not st.session_state.user:
     st.title("🔐 Login / Signup")
@@ -106,7 +107,7 @@ if not st.session_state.user:
     role = st.session_state.login_type.lower()
     login_tab, signup_tab = st.tabs(["Login", "Sign Up"])
 
-    # ---------- LOGIN ----------
+    # LOGIN
     with login_tab:
         email = st.text_input("Email", key="login_email")
         password = st.text_input("Password", type="password", key="login_pass")
@@ -120,7 +121,7 @@ if not st.session_state.user:
             else:
                 st.error("Invalid email, password, or role")
 
-    # ---------- SIGNUP ----------
+    # SIGNUP
     with signup_tab:
         username = st.text_input("Username")
         email = st.text_input("Email", key="signup_email")
@@ -128,10 +129,9 @@ if not st.session_state.user:
 
         if st.button("Sign Up"):
             if signup_user(username, email, password, role):
-                # ✅ AUTO LOGIN AFTER SIGNUP (FIX)
                 st.session_state.user = email
                 st.session_state.user_role = role
-                st.success("Account created successfully!")
+                st.success("Account created and logged in!")
                 st.rerun()
             else:
                 st.error("Email already exists")
@@ -142,26 +142,51 @@ if not st.session_state.user:
 elif st.session_state.user_role == "user":
     st.title("👤 User Dashboard")
 
-    st.subheader("📷 Garbage Classification (Demo)")
-    st.info("AI model classifies garbage here (demo placeholder)")
+    # STEP 1: CATEGORY SELECTION
+    st.subheader("🗂 Select Garbage Category")
 
-    if st.button("Submit Garbage"):
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute(
-            "INSERT INTO rewards (user_email, points, status) VALUES (?, ?, ?)",
-            (st.session_state.user, 10, "PENDING")
-        )
-        conn.commit()
-        conn.close()
-        st.success("Submission successful! Reward pending admin approval.")
+    category = st.radio(
+        "Choose garbage type before uploading:",
+        ["General Waste", "Furniture"],
+        horizontal=True
+    )
 
+    st.divider()
+
+    # STEP 2: IMAGE UPLOAD
+    st.subheader("📷 Upload Garbage Image")
+
+    uploaded_file = st.file_uploader(
+        f"Upload {category} image",
+        type=["jpg", "jpeg", "png"]
+    )
+
+    if uploaded_file:
+        st.image(uploaded_file, caption=f"{category} Image", use_column_width=True)
+        st.info("AI garbage classification model runs here (demo placeholder)")
+
+        if st.button("Submit Garbage"):
+            conn = sqlite3.connect(DB_PATH)
+            c = conn.cursor()
+            c.execute(
+                "INSERT INTO rewards (user_email, category, points, status) VALUES (?, ?, ?, ?)",
+                (st.session_state.user, category, 10, "PENDING")
+            )
+            conn.commit()
+            conn.close()
+
+            st.success(
+                f"{category} submitted successfully! Reward pending admin approval."
+            )
+            st.rerun()
+
+    # STEP 3: REWARD STATUS
     st.subheader("🎁 Reward Status")
 
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
-        SELECT id, points, status
+        SELECT id, category, points, status
         FROM rewards
         WHERE user_email=?
         ORDER BY id DESC
@@ -171,8 +196,8 @@ elif st.session_state.user_role == "user":
     if not rewards:
         st.info("No rewards yet")
 
-    for rid, points, status in rewards:
-        st.write(f"Points: {points} | Status: {status}")
+    for rid, cat, points, status in rewards:
+        st.write(f"Category: {cat} | Points: {points} | Status: {status}")
 
         if status == "APPROVED":
             if st.button("🎉 Claim Reward", key=f"claim_{rid}"):
@@ -197,7 +222,7 @@ elif st.session_state.user_role == "admin":
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
-        SELECT id, user_email, points
+        SELECT id, user_email, category, points
         FROM rewards
         WHERE status='PENDING'
     """)
@@ -206,13 +231,14 @@ elif st.session_state.user_role == "admin":
     if not rewards:
         st.info("No pending rewards")
 
-    for rid, email, points in rewards:
-        col1, col2, col3, col4 = st.columns(4)
+    for rid, email, category, points in rewards:
+        col1, col2, col3, col4, col5 = st.columns(5)
         col1.write(email)
-        col2.write(points)
-        col3.write("PENDING")
+        col2.write(category)
+        col3.write(points)
+        col4.write("PENDING")
 
-        if col4.button("Approve", key=f"approve_{rid}"):
+        if col5.button("Approve", key=f"approve_{rid}"):
             c.execute(
                 "UPDATE rewards SET status='APPROVED' WHERE id=?",
                 (rid,)
