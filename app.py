@@ -79,19 +79,51 @@ def login_user(email, password):
 st.title("♻️ Smart Recycling Reward System")
 
 # =============================
-# LOGIN
+# LOGIN / SIGNUP
 # =============================
 if st.session_state.user is None:
-    st.subheader("Login")
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
+    st.subheader("Login or Sign Up")
+    
+    option = st.radio("Choose an option", ["Login", "Sign Up"])
+    
+    if option == "Login":
+        email = st.text_input("Email")
+        password = st.text_input("Password", type="password")
 
-    if st.button("Login"):
-        if login_user(email, password):
-            st.session_state.user = email
-            st.rerun()
-        else:
-            st.error("Invalid login")
+        if st.button("Login"):
+            if login_user(email, password):
+                st.session_state.user = email
+                st.rerun()
+            else:
+                st.error("Invalid login")
+
+    elif option == "Sign Up":
+        username = st.text_input("Username")
+        email = st.text_input("Email")
+        password = st.text_input("Password", type="password")
+        confirm_password = st.text_input("Confirm Password", type="password")
+
+        if st.button("Sign Up"):
+            if password != confirm_password:
+                st.error("Passwords do not match")
+            elif not username or not email or not password:
+                st.error("All fields are required")
+            else:
+                # Check if email already exists
+                conn = sqlite3.connect(DB_PATH)
+                c = conn.cursor()
+                c.execute("SELECT * FROM users WHERE email=?", (email,))
+                if c.fetchone():
+                    st.error("Email already registered")
+                else:
+                    hashed_password = generate_password_hash(password)
+                    c.execute(
+                        "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
+                        (username, email, hashed_password)
+                    )
+                    conn.commit()
+                    conn.close()
+                    st.success("Sign Up successful! Please login.")
 
 # =============================
 # CATEGORY
