@@ -100,11 +100,20 @@ def signup_user(name, email, password):
     return True
 
 # =============================
-# ROLE SELECTION
+# ROLE SELECTION (FIXED)
 # =============================
 if st.session_state.role is None:
     st.subheader("Select Role")
-    st.session_state.role = st.radio("Choose your role", ["USER", "ADMIN"])
+
+    role_choice = st.radio(
+        "Choose your role",
+        ["USER", "ADMIN"],
+        index=None   # 👈 IMPORTANT: no default selection
+    )
+
+    if role_choice:
+        st.session_state.role = role_choice
+        st.experimental_rerun()
 
 # =============================
 # ADMIN LOGIN / SIGNUP
