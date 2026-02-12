@@ -12,13 +12,13 @@ DB_PATH = "garbage_app.db"
 st.set_page_config(page_title="Garbage Classification System", layout="wide")
 
 # =====================================================
-# LOAD MODEL (ONLY ONE MODEL)
+# LOAD MODEL (GENERAL WASTE ONLY)
 # =====================================================
 @st.cache_resource
-def load_model():
+def load_general_model():
     return tf.keras.models.load_model("general_waste.h5")
 
-model = load_model()
+general_model = load_general_model()
 
 # =====================================================
 # DATABASE INIT
@@ -37,17 +37,6 @@ def init_db():
     )
     """)
 
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS rewards (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_email TEXT,
-        category TEXT,
-        station TEXT,
-        points INTEGER,
-        status TEXT
-    )
-    """)
-
     conn.commit()
     conn.close()
 
@@ -57,17 +46,17 @@ init_db()
 # IMAGE PREPROCESSING
 # =====================================================
 def preprocess_image(image):
-    image = image.resize((224, 224))  # Change ONLY if your model uses different size
+    image = image.resize((224, 224))  # change if your model uses different size
     image = np.array(image) / 255.0
     image = np.expand_dims(image, axis=0)
     return image
 
 # =====================================================
-# PREDICTION FUNCTION (STRICTLY FOLLOW MODEL OUTPUT)
+# PREDICTION FUNCTION (GENERAL WASTE MODEL ONLY)
 # =====================================================
-def predict_garbage(image):
+def predict_general_waste(image):
     processed = preprocess_image(image)
-    prediction = model.predict(processed)
+    prediction = general_model.predict(processed)
 
     class_index = np.argmax(prediction)
     confidence = float(np.max(prediction))
@@ -81,7 +70,8 @@ defaults = {
     "user": None,
     "user_role": None,
     "login_type": "User",
-    "nav": "User Profile"
+    "page": "category",   # category | upload
+    "selected_category": None
 }
 
 for k, v in defaults.items():
@@ -118,26 +108,10 @@ def login_user(email, password, role):
     return row and check_password_hash(row[0], password)
 
 # =====================================================
-# SIDEBAR
-# =====================================================
-st.sidebar.title("♻️ Garbage Classification")
-
-if st.session_state.user:
-    st.sidebar.success(f"Logged in as {st.session_state.user_role.upper()}")
-
-    st.session_state.nav = st.sidebar.radio(
-        "Navigation",
-        ["User Profile", "Upload Garbage"]
-    )
-
-    if st.sidebar.button("Logout"):
-        st.session_state.clear()
-        st.rerun()
-
-# =====================================================
 # LOGIN PAGE
 # =====================================================
 if not st.session_state.user:
+
     st.title("🔐 Login / Signup")
 
     st.radio("Login as:", ["User", "Admin"], horizontal=True, key="login_type")
@@ -152,6 +126,7 @@ if not st.session_state.user:
             if login_user(email, password, role):
                 st.session_state.user = email
                 st.session_state.user_role = role
+                st.session_state.page = "category"
                 st.rerun()
             else:
                 st.error("Invalid credentials")
@@ -164,28 +139,41 @@ if not st.session_state.user:
             if signup_user(username, email, password, role):
                 st.session_state.user = email
                 st.session_state.user_role = role
+                st.session_state.page = "category"
                 st.rerun()
             else:
                 st.error("Email already exists")
 
 # =====================================================
-# USER DASHBOARD
+# USER FLOW
 # =====================================================
 elif st.session_state.user_role == "user":
 
-    if st.session_state.nav == "User Profile":
-        st.title("👤 User Profile")
-        st.write(f"Email: {st.session_state.user}")
-        st.write("Role: User")
+    # ---------------- CATEGORY PAGE ----------------
+    if st.session_state.page == "category":
 
-    elif st.session_state.nav == "Upload Garbage":
-        st.title("📷 Upload Garbage")
+        st.title("📂 Choose Garbage Category")
 
-        category = st.radio(
-            "Choose category:",
-            ["General Waste", "Furniture"],
-            horizontal=True
-        )
+        col1, col2 = st.columns(2)
+
+        if col1.button("🗑 General Waste"):
+            st.session_state.selected_category = "General Waste"
+            st.session_state.page = "upload"
+            st.rerun()
+
+        if col2.button("🪑 Furniture"):
+            st.session_state.selected_category = "Furniture"
+            st.session_state.page = "upload"
+            st.rerun()
+
+    # ---------------- UPLOAD PAGE ----------------
+    elif st.session_state.page == "upload":
+
+        st.title(f"📷 Upload Image - {st.session_state.selected_category}")
+
+        if st.button("⬅ Back to Category"):
+            st.session_state.page = "category"
+            st.rerun()
 
         uploaded_file = st.file_uploader("Upload image", type=["jpg", "jpeg", "png"])
 
@@ -194,14 +182,19 @@ elif st.session_state.user_role == "user":
             st.image(image, use_column_width=True)
 
             if st.button("🔍 Predict"):
-                with st.spinner("Analyzing image..."):
-                    class_index, confidence = predict_garbage(image)
 
-                st.success(f"Predicted Class Index: {class_index}")
-                st.info(f"Confidence: {confidence*100:.2f}%")
+                if st.session_state.selected_category == "General Waste":
+                    with st.spinner("Analyzing with general_waste.h5..."):
+                        class_index, confidence = predict_general_waste(image)
+
+                    st.success(f"Predicted Class Index: {class_index}")
+                    st.info(f"Confidence: {confidence*100:.2f}%")
+
+                else:
+                    st.warning("Furniture model not implemented yet.")
 
 # =====================================================
-# ADMIN DASHBOARD
+# ADMIN
 # =====================================================
 elif st.session_state.user_role == "admin":
     st.title("🛠 Admin Dashboard")
