@@ -1,130 +1,174 @@
-from flask import Flask, request, redirect, url_for, session, render_template_string
-import os
+import streamlit as st
+import sqlite3
+import tensorflow as tf
 import numpy as np
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
+from PIL import Image
+from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
-app = Flask(__name__)
-app.secret_key = "fyp_secret_key"
+# =============================
+# PAGE CONFIG
+# =============================
+st.set_page_config(page_title="AI Waste Classification", page_icon="♻️")
 
-# Create upload folder if not exists
-UPLOAD_FOLDER = "uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# =============================
+# DATABASE
+# =============================
+DB_PATH = "users.db"
 
-# Load your trained model
-model = load_model("FYP_general_waste.h5")
-categories = ["paper", "plastic", "metal", "glass", "cardboard", "trash"]
+def init_db():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
 
-# ---------------- ROUTES ----------------
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT,
+        email TEXT UNIQUE,
+        password TEXT
+    )
+    """)
 
-# LOGIN PAGE
-@app.route('/', methods=["GET", "POST"])
-def login():
-    login_html = '''
-    <h2>Login</h2>
-    <form method="POST">
-        <label>Select Role:</label><br><br>
-        <select name="role">
-            <option value="USER">USER</option>
-            <option value="ADMIN">ADMIN</option>
-        </select>
-        <br><br>
-        <button type="submit">Enter</button>
-    </form>
-    <p>Don't have account? <a href="/signup">Sign Up</a></p>
-    '''
-    if request.method == "POST":
-        role = request.form["role"]
-        session["role"] = role
-        return redirect(url_for("dashboard"))
-    return render_template_string(login_html)
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS rewards (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_email TEXT,
+        points INTEGER,
+        status TEXT,
+        station TEXT
+    )
+    """)
 
-# SIGNUP PAGE
-@app.route('/signup', methods=["GET", "POST"])
-def signup():
-    signup_html = '''
-    <h2>Sign Up</h2>
-    <form method="POST">
-        <label>Username:</label><br>
-        <input type="text" name="username" required><br><br>
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
-        <label>Select Role:</label><br>
-        <select name="role">
-            <option value="USER">USER</option>
-            <option value="ADMIN">ADMIN</option>
-        </select>
-        <br><br>
-        <button type="submit">Sign Up</button>
-    </form>
-    <p>Already have account? <a href="/">Login</a></p>
-    '''
-    if request.method == "POST":
-        # In a real app, save user info to database
-        role = request.form["role"]
-        session["role"] = role
-        return redirect(url_for("dashboard"))
-    return render_template_string(signup_html)
+    conn.commit()
+    conn.close()
 
-# DASHBOARD PAGE
-@app.route('/dashboard')
-def dashboard():
-    role = session.get("role", "USER")
-    dashboard_html = '''
-    <h2>Welcome {{ role }}</h2>
-    <a href="/category">Choose Garbage Category</a>
-    '''
-    return render_template_string(dashboard_html, role=role)
+init_db()
 
-# CATEGORY SELECTION PAGE
-@app.route('/category')
-def category():
-    category_html = '''
-    <h2>Select Garbage Category</h2>
-    <a href="/upload/GENERAL_WASTE"><button>GENERAL WASTE</button></a>
-    <a href="/upload/FURNITURE"><button>FURNITURE</button></a>
-    '''
-    return render_template_string(category_html)
+# =============================
+# MODELS
+# =============================
+@st.cache_resource
+def load_garbage_model():
+    return tf.keras.models.load_model("garbage_classifier.h5")
 
-# UPLOAD PAGE
-@app.route('/upload/<garbage_type>', methods=["GET", "POST"])
-def upload(garbage_type):
-    if request.method == "POST" and garbage_type == "GENERAL_WASTE":
-        file = request.files["image"]
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-        file.save(filepath)
+@st.cache_resource
+def load_furniture_model():
+    return tf.keras.models.load_model("hcr_model.h5")
 
-        # Preprocess image
-        img = image.load_img(filepath, target_size=(224, 224))
-        img_array = image.img_to_array(img)
-        img_array = np.expand_dims(img_array, axis=0) / 255.0
+# =============================
+# SESSION STATE
+# =============================
+for key in ["user", "category", "reward_pending"]:
+    if key not in st.session_state:
+        st.session_state[key] = None
 
-        # Predict
-        prediction = model.predict(img_array)
-        predicted_class = categories[np.argmax(prediction)]
+# =============================
+# AUTH
+# =============================
+def login_user(email, password):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT password FROM users WHERE email=?", (email,))
+    row = c.fetchone()
+    conn.close()
+    return row and check_password_hash(row[0], password)
 
-        return render_template_string('''
-        <h2>Prediction Result</h2>
-        <img src="/{{ filepath }}" width="300"><br><br>
-        <h3>Predicted Category: {{ result }}</h3>
-        <a href="/category">Back</a>
-        ''', filepath=filepath, result=predicted_class)
+# =============================
+# UI HEADER
+# =============================
+st.title("♻️ Smart Recycling Reward System")
 
-    # GET request or FURNITURE
-    upload_html = '''
-    <h2>Upload Garbage Image - {{ garbage_type }}</h2>
-    {% if garbage_type == "GENERAL_WASTE" %}
-    <form method="POST" enctype="multipart/form-data">
-        <input type="file" name="image" required><br><br>
-        <button type="submit">Predict</button>
-    </form>
-    {% else %}
-    <p>Furniture classification model not available yet.</p>
-    {% endif %}
-    '''
-    return render_template_string(upload_html, garbage_type=garbage_type)
+# =============================
+# LOGIN
+# =============================
+if st.session_state.user is None:
+    st.subheader("Login")
+    email = st.text_input("Email")
+    password = st.text_input("Password", type="password")
 
-# RUN SERVER
-if __name__ == "__main__":
-    app.run(debug=True)
+    if st.button("Login"):
+        if login_user(email, password):
+            st.session_state.user = email
+            st.rerun()
+        else:
+            st.error("Invalid login")
+
+# =============================
+# CATEGORY
+# =============================
+elif st.session_state.category is None:
+    st.subheader("Select Category")
+    category = st.radio("Choose waste type", ["General Waste", "Furniture"])
+
+    if st.button("Continue"):
+        st.session_state.category = category
+        st.rerun()
+
+# =============================
+# UPLOAD & PREDICT
+# =============================
+elif st.session_state.reward_pending is None:
+    st.subheader("Upload Image")
+
+    file = st.file_uploader("Upload garbage image", type=["jpg", "png", "jpeg"])
+
+    if file:
+        image = Image.open(file).convert("RGB")
+        st.image(image, use_container_width=True)
+
+        img = image.resize((224, 224))
+        arr = np.array(img) / 255.0
+        arr = np.expand_dims(arr, axis=0)
+
+        if st.session_state.category == "General Waste":
+            model = load_garbage_model()
+            labels = ["Paper", "Plastic", "Metal", "Glass", "Organic", "Trash"]
+        else:
+            model = load_furniture_model()
+            labels = ["Chair", "Table", "Sofa", "Bed", "Cabinet"]
+
+        pred = model.predict(arr)
+        result = labels[np.argmax(pred)]
+
+        st.success(f"Prediction Result: {result}")
+
+        # ----- CREATE PENDING REWARD -----
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute(
+            "INSERT INTO rewards VALUES (NULL, ?, ?, ?, ?)",
+            (st.session_state.user, 10, "PENDING", None)
+        )
+        conn.commit()
+        conn.close()
+
+        st.session_state.reward_pending = True
+        st.rerun()
+
+# =============================
+# REWARD PAGE
+# =============================
+else:
+    st.subheader("🎁 Reward Status")
+
+    st.info("You earned **10 points** (Status: PENDING)")
+
+    station = st.selectbox(
+        "Choose nearby recycling station",
+        ["EcoPoint Center", "GreenCycle Hub", "City Recycling Station"]
+    )
+
+    if st.button("Confirm Delivery"):
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("""
+            UPDATE rewards
+            SET status='EARNED', station=?
+            WHERE user_email=? AND status='PENDING'
+        """, (station, st.session_state.user))
+        conn.commit()
+        conn.close()
+
+        st.success("✅ Points earned successfully!")
+        st.session_state.reward_pending = None
+        st.session_state.category = None
