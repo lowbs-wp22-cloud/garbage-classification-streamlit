@@ -49,7 +49,7 @@ init_db()
 # =============================
 @st.cache_resource
 def load_garbage_model():
-    return tf.keras.models.load_model("garbage_classifier.h5")
+    return tf.keras.models.load_model("FYP_general_waste.h5")
 
 @st.cache_resource
 def load_furniture_model():
@@ -148,7 +148,7 @@ elif st.session_state.reward_pending is None:
         image = Image.open(file).convert("RGB")
         st.image(image, use_container_width=True)
 
-        img = image.resize((224, 224))
+        img = image.resize((112, 112))
         arr = np.array(img) / 255.0
         arr = np.expand_dims(arr, axis=0)
 
@@ -164,7 +164,7 @@ elif st.session_state.reward_pending is None:
 
         st.success(f"Prediction Result: {result}")
 
-        # ----- CREATE PENDING REWARD -----
+        # ----- CREATE PENDING REWARD (but don't switch page automatically) -----
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         c.execute(
@@ -175,12 +175,15 @@ elif st.session_state.reward_pending is None:
         conn.close()
 
         st.session_state.reward_pending = True
-        st.rerun()
 
+        # ----- Add a button to check reward manually -----
+        if st.button("Check Reward"):
+            st.session_state.show_reward = True
+            st.rerun()
 # =============================
 # REWARD PAGE
 # =============================
-else:
+elif st.session_state.reward_pending or st.session_state.get("show_reward"):
     st.subheader("🎁 Reward Status")
 
     st.info("You earned **10 points** (Status: PENDING)")
@@ -204,3 +207,4 @@ else:
         st.success("✅ Points earned successfully!")
         st.session_state.reward_pending = None
         st.session_state.category = None
+        st.session_state.show_reward = None
