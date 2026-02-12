@@ -148,7 +148,7 @@ elif st.session_state.reward_pending is None:
         image = Image.open(file).convert("RGB")
         st.image(image, use_container_width=True)
 
-        img = image.resize((112, 112))
+        img = image.resize((224, 224))
         arr = np.array(img) / 255.0
         arr = np.expand_dims(arr, axis=0)
 
