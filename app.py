@@ -12,15 +12,13 @@ DB_PATH = "garbage_app.db"
 st.set_page_config(page_title="Garbage Classification System", layout="wide")
 
 # =====================================================
-# LOAD MODELS (CACHE FOR PERFORMANCE)
+# LOAD MODEL (ONLY ONE MODEL)
 # =====================================================
 @st.cache_resource
-def load_general_model():
+def load_model():
     return tf.keras.models.load_model("general_waste.h5")
 
-@st.cache_resource
-def load_furniture_model():
-    return tf.keras.models.load_model("furniture.h5")
+model = load_model()
 
 # =====================================================
 # DATABASE INIT
@@ -59,29 +57,22 @@ init_db()
 # IMAGE PREPROCESSING
 # =====================================================
 def preprocess_image(image):
-    image = image.resize((224, 224))  # Change if your model uses different size
+    image = image.resize((224, 224))  # Change ONLY if your model uses different size
     image = np.array(image) / 255.0
     image = np.expand_dims(image, axis=0)
     return image
 
 # =====================================================
-# PREDICTION FUNCTION
+# PREDICTION FUNCTION (STRICTLY FOLLOW MODEL OUTPUT)
 # =====================================================
-def predict_garbage(image, category):
-    image = preprocess_image(image)
+def predict_garbage(image):
+    processed = preprocess_image(image)
+    prediction = model.predict(processed)
 
-    if category == "General Waste":
-        model = load_general_model()
-        class_names = ["Plastic", "Paper", "Metal", "Organic"]
-    else:
-        model = load_furniture_model()
-        class_names = ["Chair", "Table", "Sofa", "Cabinet"]
-
-    prediction = model.predict(image)
     class_index = np.argmax(prediction)
     confidence = float(np.max(prediction))
 
-    return class_names[class_index], confidence
+    return class_index, confidence
 
 # =====================================================
 # SESSION DEFAULTS
@@ -90,9 +81,7 @@ defaults = {
     "user": None,
     "user_role": None,
     "login_type": "User",
-    "page": "upload",
-    "nav": "User Profile",
-    "category": None
+    "nav": "User Profile"
 }
 
 for k, v in defaults.items():
@@ -138,7 +127,7 @@ if st.session_state.user:
 
     st.session_state.nav = st.sidebar.radio(
         "Navigation",
-        ["User Profile", "Upload Garbage", "Reward History"]
+        ["User Profile", "Upload Garbage"]
     )
 
     if st.sidebar.button("Logout"):
@@ -187,6 +176,7 @@ elif st.session_state.user_role == "user":
     if st.session_state.nav == "User Profile":
         st.title("👤 User Profile")
         st.write(f"Email: {st.session_state.user}")
+        st.write("Role: User")
 
     elif st.session_state.nav == "Upload Garbage":
         st.title("📷 Upload Garbage")
@@ -205,9 +195,9 @@ elif st.session_state.user_role == "user":
 
             if st.button("🔍 Predict"):
                 with st.spinner("Analyzing image..."):
-                    label, confidence = predict_garbage(image, category)
+                    class_index, confidence = predict_garbage(image)
 
-                st.success(f"Predicted Class: {label}")
+                st.success(f"Predicted Class Index: {class_index}")
                 st.info(f"Confidence: {confidence*100:.2f}%")
 
 # =====================================================
