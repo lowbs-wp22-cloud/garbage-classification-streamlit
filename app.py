@@ -7,6 +7,7 @@ from tensorflow.keras.preprocessing import image
 app = Flask(__name__)
 app.secret_key = "fyp_secret_key"
 
+# Create upload folder if not exists
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -60,7 +61,7 @@ def signup():
     <p>Already have account? <a href="/">Login</a></p>
     '''
     if request.method == "POST":
-        # In real project, save user info to DB (skipped for simplicity)
+        # In a real app, save user info to database
         role = request.form["role"]
         session["role"] = role
         return redirect(url_for("dashboard"))
@@ -70,11 +71,11 @@ def signup():
 @app.route('/dashboard')
 def dashboard():
     role = session.get("role", "USER")
-    dashboard_html = f'''
-    <h2>Welcome {role}</h2>
+    dashboard_html = '''
+    <h2>Welcome {{ role }}</h2>
     <a href="/category">Choose Garbage Category</a>
     '''
-    return render_template_string(dashboard_html)
+    return render_template_string(dashboard_html, role=role)
 
 # CATEGORY SELECTION PAGE
 @app.route('/category')
@@ -89,17 +90,6 @@ def category():
 # UPLOAD PAGE
 @app.route('/upload/<garbage_type>', methods=["GET", "POST"])
 def upload(garbage_type):
-    upload_html = f'''
-    <h2>Upload Garbage Image - {garbage_type}</h2>
-    {% if garbage_type == "GENERAL_WASTE" %}
-    <form method="POST" enctype="multipart/form-data">
-        <input type="file" name="image" required><br><br>
-        <button type="submit">Predict</button>
-    </form>
-    {% else %}
-    <p>Furniture classification model not available yet.</p>
-    {% endif %}
-    '''
     if request.method == "POST" and garbage_type == "GENERAL_WASTE":
         file = request.files["image"]
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
@@ -113,12 +103,26 @@ def upload(garbage_type):
         # Predict
         prediction = model.predict(img_array)
         predicted_class = categories[np.argmax(prediction)]
-        return render_template_string(f'''
+
+        return render_template_string('''
         <h2>Prediction Result</h2>
-        <img src="/{filepath}" width="300"><br><br>
-        <h3>Predicted Category: {predicted_class}</h3>
+        <img src="/{{ filepath }}" width="300"><br><br>
+        <h3>Predicted Category: {{ result }}</h3>
         <a href="/category">Back</a>
-        ''')
+        ''', filepath=filepath, result=predicted_class)
+
+    # GET request or FURNITURE
+    upload_html = '''
+    <h2>Upload Garbage Image - {{ garbage_type }}</h2>
+    {% if garbage_type == "GENERAL_WASTE" %}
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="image" required><br><br>
+        <button type="submit">Predict</button>
+    </form>
+    {% else %}
+    <p>Furniture classification model not available yet.</p>
+    {% endif %}
+    '''
     return render_template_string(upload_html, garbage_type=garbage_type)
 
 # RUN SERVER
