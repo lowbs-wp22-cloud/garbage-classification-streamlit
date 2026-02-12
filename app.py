@@ -4,7 +4,6 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 from werkzeug.security import generate_password_hash, check_password_hash
-import os
 
 # =============================
 # PAGE CONFIG
@@ -19,7 +18,6 @@ DB_PATH = "users.db"
 def init_db():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-
     c.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,7 +26,6 @@ def init_db():
         password TEXT
     )
     """)
-
     c.execute("""
     CREATE TABLE IF NOT EXISTS rewards (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -38,7 +35,6 @@ def init_db():
         station TEXT
     )
     """)
-
     conn.commit()
     conn.close()
 
@@ -49,7 +45,7 @@ init_db()
 # =============================
 @st.cache_resource
 def load_garbage_model():
-    return tf.keras.models.load_model("FYP_general_waste.h5")
+    return tf.keras.models.load_model("garbage_classifier.h5")
 
 @st.cache_resource
 def load_furniture_model():
@@ -58,12 +54,12 @@ def load_furniture_model():
 # =============================
 # SESSION STATE
 # =============================
-for key in ["user", "category", "reward_pending"]:
+for key in ["role", "user", "category", "reward_pending", "show_reward"]:
     if key not in st.session_state:
         st.session_state[key] = None
 
 # =============================
-# AUTH
+# AUTH FUNCTIONS
 # =============================
 def login_user(email, password):
     conn = sqlite3.connect(DB_PATH)
@@ -73,22 +69,31 @@ def login_user(email, password):
     conn.close()
     return row and check_password_hash(row[0], password)
 
-# =============================
-# UI HEADER
-# =============================
-st.title("♻️ Smart Recycling Reward System")
+def signup_user(username, email, password):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT * FROM users WHERE email=?", (email,))
+    if c.fetchone():
+        conn.close()
+        return False
+    hashed_password = generate_password_hash(password)
+    c.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
+              (username, email, hashed_password))
+    conn.commit()
+    conn.close()
+    return True
 
 # =============================
 # ROLE SELECTION
 # =============================
-if "role" not in st.session_state:
+if st.session_state.role is None:
     st.subheader("Select Role")
     st.session_state.role = st.radio("Choose your role", ["USER", "ADMIN"])
 
 # =============================
-# ADMIN VIEW
+# ADMIN DASHBOARD
 # =============================
-if st.session_state.role == "ADMIN":
+elif st.session_state.role == "ADMIN":
     st.title("Admin Dashboard - Pending Rewards")
     
     conn = sqlite3.connect(DB_PATH)
@@ -111,13 +116,12 @@ if st.session_state.role == "ADMIN":
                 st.experimental_rerun()
     else:
         st.info("No pending rewards.")
-        
+
 # =============================
-# LOGIN / SIGNUP
+# USER LOGIN / SIGNUP
 # =============================
-if st.session_state.user is None:
+elif st.session_state.role == "USER" and st.session_state.user is None:
     st.subheader("Login or Sign Up")
-    
     option = st.radio("Choose an option", ["Login", "Sign Up"])
     
     if option == "Login":
@@ -142,36 +146,23 @@ if st.session_state.user is None:
                 st.error("Passwords do not match")
             elif not username or not email or not password:
                 st.error("All fields are required")
+            elif signup_user(username, email, password):
+                st.success("Sign Up successful! Please login.")
             else:
-                # Check if email already exists
-                conn = sqlite3.connect(DB_PATH)
-                c = conn.cursor()
-                c.execute("SELECT * FROM users WHERE email=?", (email,))
-                if c.fetchone():
-                    st.error("Email already registered")
-                else:
-                    hashed_password = generate_password_hash(password)
-                    c.execute(
-                        "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
-                        (username, email, hashed_password)
-                    )
-                    conn.commit()
-                    conn.close()
-                    st.success("Sign Up successful! Please login.")
+                st.error("Email already registered")
 
 # =============================
-# CATEGORY
+# USER CATEGORY SELECTION
 # =============================
 elif st.session_state.category is None:
     st.subheader("Select Category")
     category = st.radio("Choose waste type", ["General Waste", "Furniture"])
-
     if st.button("Continue"):
         st.session_state.category = category
         st.rerun()
 
 # =============================
-# UPLOAD & PREDICT
+# USER IMAGE UPLOAD & PREDICT
 # =============================
 elif st.session_state.reward_pending is None:
     st.subheader("Upload Image")
@@ -182,10 +173,6 @@ elif st.session_state.reward_pending is None:
         image = Image.open(file).convert("RGB")
         st.image(image, use_container_width=True)
 
-        img = image.resize((224, 224))
-        arr = np.array(img) / 255.0
-        arr = np.expand_dims(arr, axis=0)
-
         if st.session_state.category == "General Waste":
             model = load_garbage_model()
             labels = ["Paper", "Plastic", "Metal", "Glass", "Organic", "Trash"]
@@ -193,12 +180,20 @@ elif st.session_state.reward_pending is None:
             model = load_furniture_model()
             labels = ["Chair", "Table", "Sofa", "Bed", "Cabinet"]
 
-        pred = model.predict(arr)
-        result = labels[np.argmax(pred)]
+        # Dynamic model input size
+        target_height, target_width = model.input_shape[1], model.input_shape[2]
+        img = image.resize((target_width, target_height))
+        arr = np.array(img) / 255.0
+        arr = np.expand_dims(arr, axis=0)
 
-        st.success(f"Prediction Result: {result}")
+        try:
+            pred = model.predict(arr)
+            result = labels[np.argmax(pred)]
+            st.success(f"Prediction Result: {result}")
+        except Exception as e:
+            st.error(f"Prediction failed: {e}")
 
-        # ----- CREATE PENDING REWARD (but don't switch page automatically) -----
+        # Create pending reward
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         c.execute(
@@ -207,38 +202,52 @@ elif st.session_state.reward_pending is None:
         )
         conn.commit()
         conn.close()
-
         st.session_state.reward_pending = True
 
-        # ----- Add a button to check reward manually -----
+        # Button to manually check reward
         if st.button("Check Reward"):
             st.session_state.show_reward = True
             st.rerun()
+
 # =============================
-# REWARD PAGE
+# USER REWARD PAGE
 # =============================
 elif st.session_state.reward_pending or st.session_state.get("show_reward"):
     st.subheader("🎁 Reward Status")
 
-    st.info("You earned **10 points** (Status: PENDING)")
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT points, status, station FROM rewards WHERE user_email=? ORDER BY id DESC LIMIT 1",
+              (st.session_state.user,))
+    reward = c.fetchone()
+    conn.close()
+
+    if reward:
+        points, status, station = reward
+        st.info(f"You earned **{points} points** (Status: {status})")
+        if status == "PENDING":
+            st.warning("Waiting for ADMIN approval...")
+        else:
+            st.success(f"Reward Approved! Delivered to: {station}")
+    else:
+        st.info("No rewards yet.")
 
     station = st.selectbox(
         "Choose nearby recycling station",
         ["EcoPoint Center", "GreenCycle Hub", "City Recycling Station"]
     )
 
-    if st.button("Confirm Delivery"):
+    if st.button("Confirm Delivery") and status == "APPROVED":
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         c.execute("""
             UPDATE rewards
-            SET status='EARNED', station=?
-            WHERE user_email=? AND status='PENDING'
+            SET station=?
+            WHERE user_email=? AND status='APPROVED'
         """, (station, st.session_state.user))
         conn.commit()
         conn.close()
-
-        st.success("✅ Points earned successfully!")
+        st.success("✅ Delivery confirmed!")
         st.session_state.reward_pending = None
         st.session_state.category = None
         st.session_state.show_reward = None
