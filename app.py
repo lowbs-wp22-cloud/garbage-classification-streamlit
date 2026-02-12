@@ -91,7 +91,42 @@ if st.session_state.role is None:
     st.session_state.role = st.radio("Choose your role", ["USER", "ADMIN"])
 
 # =============================
-# ADMIN DASHBOARD
+# LOGIN / SIGNUP FOR BOTH ROLES
+# =============================
+if st.session_state.user is None:
+    st.subheader(f"{st.session_state.role} Login or Sign Up")
+    option = st.radio("Choose an option", ["Login", "Sign Up"])
+    
+    if option == "Login":
+        email = st.text_input("Email", key="login_email")
+        password = st.text_input("Password", type="password", key="login_password")
+
+        if st.button("Login"):
+            if login_user(email, password):
+                st.session_state.user = email
+                st.success(f"Login successful as {st.session_state.role}!")
+                st.rerun()
+            else:
+                st.error("Invalid login")
+
+    elif option == "Sign Up":
+        username = st.text_input("Username", key="signup_username")
+        email = st.text_input("Email", key="signup_email")
+        password = st.text_input("Password", type="password", key="signup_password")
+        confirm_password = st.text_input("Confirm Password", type="password", key="signup_confirm")
+
+        if st.button("Sign Up"):
+            if password != confirm_password:
+                st.error("Passwords do not match")
+            elif not username or not email or not password:
+                st.error("All fields are required")
+            elif signup_user(username, email, password):
+                st.success(f"Sign Up successful as {st.session_state.role}! Please login.")
+            else:
+                st.error("Email already registered")
+
+# =============================
+# ADMIN DASHBOARD AFTER LOGIN
 # =============================
 elif st.session_state.role == "ADMIN":
     st.title("Admin Dashboard - Pending Rewards")
@@ -116,6 +151,7 @@ elif st.session_state.role == "ADMIN":
                 st.experimental_rerun()
     else:
         st.info("No pending rewards.")
+
 
 # =============================
 # USER LOGIN / SIGNUP
