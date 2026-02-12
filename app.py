@@ -12,7 +12,7 @@ DB_PATH = "garbage_app.db"
 st.set_page_config(page_title="Garbage Classification System", layout="wide")
 
 # =====================================================
-# LOAD MODEL (GENERAL WASTE ONLY)
+# LOAD MODEL (ONLY general_waste.h5)
 # =====================================================
 @st.cache_resource
 def load_general_model():
@@ -46,22 +46,23 @@ init_db()
 # IMAGE PREPROCESSING
 # =====================================================
 def preprocess_image(image):
-    image = image.resize((224, 224))  # change if your model uses different size
+    image = image.resize((224, 224))   # Change if your model uses different size
     image = np.array(image) / 255.0
     image = np.expand_dims(image, axis=0)
     return image
 
 # =====================================================
-# PREDICTION FUNCTION (GENERAL WASTE MODEL ONLY)
+# PREDICTION FUNCTION
+# (No class name mapping, follow model output directly)
 # =====================================================
 def predict_general_waste(image):
     processed = preprocess_image(image)
     prediction = general_model.predict(processed)
 
-    class_index = np.argmax(prediction)
+    predicted_class = np.argmax(prediction)
     confidence = float(np.max(prediction))
 
-    return class_index, confidence
+    return predicted_class, confidence
 
 # =====================================================
 # SESSION DEFAULTS
@@ -70,7 +71,7 @@ defaults = {
     "user": None,
     "user_role": None,
     "login_type": "User",
-    "page": "category",   # category | upload
+    "page": "category",
     "selected_category": None
 }
 
@@ -184,18 +185,19 @@ elif st.session_state.user_role == "user":
             if st.button("🔍 Predict"):
 
                 if st.session_state.selected_category == "General Waste":
-                    with st.spinner("Analyzing with general_waste.h5..."):
-                        class_index, confidence = predict_general_waste(image)
 
-                    st.success(f"Predicted Class Index: {class_index}")
-                    st.info(f"Confidence: {confidence*100:.2f}%")
+                    with st.spinner("Analyzing image..."):
+                        predicted_class, confidence = predict_general_waste(image)
+
+                    st.markdown(f"### 🧠 Predicted Garbage : {predicted_class}")
+                    st.markdown(f"### 📊 Confidence : {confidence*100:.2f}%")
 
                 else:
                     st.warning("Furniture model not implemented yet.")
 
 # =====================================================
-# ADMIN
+# ADMIN DASHBOARD
 # =====================================================
 elif st.session_state.user_role == "admin":
     st.title("🛠 Admin Dashboard")
-    st.info("Admin features here")
+    st.info("Admin features can be implemented here.")
