@@ -83,19 +83,19 @@ def signup_user(username, email, password):
     conn.close()
     return True
 
-# =============================
+# ------------------------------
 # ROLE SELECTION
-# =============================
-if st.session_state.role is None:
+# ------------------------------
+if "role" not in st.session_state or st.session_state.role is None:
     st.subheader("Select Role")
     st.session_state.role = st.radio("Choose your role", ["USER", "ADMIN"])
 
-# =============================
+# ------------------------------
 # LOGIN / SIGNUP FOR BOTH ROLES
-# =============================
+# ------------------------------
 if st.session_state.user is None:
     st.subheader(f"{st.session_state.role} Login or Sign Up")
-    option = st.radio("Choose an option", ["Login", "Sign Up"])
+    option = st.radio("Choose an option", ["Login", "Sign Up"], key="login_signup_option")
 
     if option == "Login":
         email = st.text_input("Email", key="login_email")
@@ -105,7 +105,7 @@ if st.session_state.user is None:
             if login_user(email, password):
                 st.session_state.user = email
                 st.success(f"Login successful as {st.session_state.role}!")
-                st.rerun()
+                st.experimental_rerun()  # force rerun to jump into role flow
             else:
                 st.error("Invalid login")
 
@@ -125,6 +125,21 @@ if st.session_state.user is None:
             else:
                 st.error("Email already registered")
 
+# ------------------------------
+# ADMIN DASHBOARD
+# ------------------------------
+elif st.session_state.role == "ADMIN" and st.session_state.user:
+    st.title("Admin Dashboard")
+    # show pending rewards, approve buttons...
+    st.write("ADMIN dashboard goes here.")
+
+# ------------------------------
+# USER FLOW
+# ------------------------------
+elif st.session_state.role == "USER" and st.session_state.user:
+    st.title("USER Flow")
+    # category -> prediction -> reward
+    st.write("USER flow goes here.")
 # =============================
 # ADMIN DASHBOARD AFTER LOGIN
 # =============================
