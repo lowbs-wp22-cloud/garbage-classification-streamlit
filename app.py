@@ -61,7 +61,7 @@ init_db()
 # =============================
 @st.cache_resource
 def load_garbage_model():
-    return tf.keras.models.load_model("garbage_classifier.h5")
+    return tf.keras.models.load_model("FYP_general_waste.h5")
 
 @st.cache_resource
 def load_furniture_model():
@@ -250,7 +250,7 @@ elif st.session_state.role == "USER" and st.session_state.user:
             
             if st.session_state.category == "General Waste":
                 model = load_garbage_model()
-                labels = ["Paper", "Plastic", "Metal", "Glass", "Organic", "Trash"]
+                labels = ["Paper", "Plastic", "Metal", "Glass", "Cardboard", "Trash"]
             else:
                 model = load_furniture_model()
                 labels = ["Chair", "Table", "Sofa", "Bed", "Cabinet"]
