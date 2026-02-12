@@ -16,7 +16,7 @@ st.set_page_config(page_title="Garbage Classification System", layout="wide")
 # =====================================================
 @st.cache_resource
 def load_general_model():
-    return tf.keras.models.load_model("general_waste.h5")
+    return tf.keras.models.load_model("FYP_general_waste.h5")
 
 general_model = load_general_model()
 
