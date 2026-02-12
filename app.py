@@ -113,7 +113,7 @@ if st.session_state.role is None:
 
     if role_choice:
         st.session_state.role = role_choice
-        st.experimental_rerun()
+        st.rerun()
 
 # =============================
 # ADMIN LOGIN / SIGNUP
@@ -135,7 +135,7 @@ if st.session_state.role == "ADMIN" and st.session_state.user is None:
             if row and check_password_hash(row[0], password):
                 st.session_state.user = staff_id
                 st.success("ADMIN login successful!")
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error("Invalid StaffID or Password")
                 
@@ -178,7 +178,7 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
             if login_user(email, password):
                 st.session_state.user = email
                 st.success("USER login successful!")
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error("Invalid Email or Password")
                 
@@ -221,7 +221,7 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
                 conn.commit()
                 conn.close()
                 st.success(f"Reward for {user_email} approved!")
-                st.experimental_rerun()
+                st.rerun()
     else:
         st.info("No pending rewards.")
 
@@ -237,7 +237,7 @@ elif st.session_state.role == "USER" and st.session_state.user:
         category = st.radio("Choose waste type", ["General Waste", "Furniture"])
         if st.button("Continue"):
             st.session_state.category = category
-            st.experimental_rerun()
+            st.rerun()
     
     # IMAGE UPLOAD & PREDICT
     elif st.session_state.reward_pending is None:
