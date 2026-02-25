@@ -75,7 +75,7 @@ def load_garbage_model():
 
 @st.cache_resource
 def load_furniture_model():
-    return tf.keras.models.load_model("hcr_model.h5")
+    return tf.keras.models.load_model("bulky_classifier.h5")
 
 # =============================
 # SESSION STATE DEFAULTS
