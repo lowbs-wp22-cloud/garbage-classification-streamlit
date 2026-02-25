@@ -265,8 +265,7 @@ elif st.session_state.role == "USER" and st.session_state.user:
                 model = load_furniture_model()
                 labels = ["Chair", "Table", "Sofa", "Bed", "Cabinet"]
             
-            target_height, target_width = model.input_shape[1], model.input_shape[2]
-            img = image.resize((target_width, target_height))
+            img = image.resize((100, 100))
             arr = np.expand_dims(np.array(img)/255.0, axis=0)
             
             try:
