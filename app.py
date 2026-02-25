@@ -7,9 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import gdown
 from tensorflow.keras.models import load_model
-#===========================
-bukly added seven to nine 
-#===========================
+
 def load_bulky_model():
     if not os.path.exists("bulky_classifier.h5"):
         url = "https://drive.google.com/uc?id=1WmiUE5u7BmeTlSJYVREf6gd9U2S2l_Og"
