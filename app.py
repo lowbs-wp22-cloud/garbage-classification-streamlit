@@ -263,7 +263,15 @@ elif st.session_state.role == "USER" and st.session_state.user:
                 labels = ["Paper", "Plastic", "Metal", "Glass", "Cardboard", "Trash"]
             else:
                 model = load_furniture_model()
-                labels = ["Chair", "Table", "Sofa", "Bed", "Cabinet"]
+                labels = [
+                    "bed image",
+                    "chair image",
+                    "fridge image",
+                    "sofa image",
+                    "table image",
+                    "tv image",
+                    "wardrobe image"
+                ]
             
             img = image.resize((100, 100))
             arr = np.expand_dims(np.array(img)/255.0, axis=0)
