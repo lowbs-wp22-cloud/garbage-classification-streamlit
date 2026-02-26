@@ -278,8 +278,14 @@ elif st.session_state.role == "USER" and st.session_state.user:
             
             try:
                 pred = model.predict(arr)
-                result = labels[np.argmax(pred)]
+                confidence = float(np.max(pred))
+                index = np.argmax(pred)
+                result = labels[index]
+
+                st.write("Raw Prediction Vector:", pred)
+                st.write("Confidence:", confidence)
                 st.success(f"Prediction Result: {result}")
+
             except Exception as e:
                 st.error(f"Prediction failed: {e}")
             
