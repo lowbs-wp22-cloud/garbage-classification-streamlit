@@ -273,7 +273,7 @@ elif st.session_state.role == "USER" and st.session_state.user:
                     "wardrobe image"
                 ]
             
-            img = image.resize((100, 100))
+            img = image.resize((224, 224))
             arr = np.expand_dims(np.array(img)/255.0, axis=0)
             
             try:
