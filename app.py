@@ -252,6 +252,15 @@ elif st.session_state.role == "USER" and st.session_state.user:
     # IMAGE UPLOAD & PREDICT
     elif st.session_state.reward_pending is None:
         st.subheader("Upload Image")
+        
+        expected_furniture = None
+        if st.session_state.category == "Furniture":
+            st.info("Supported bulky categories: Bed, Chair, Fridge, Sofa, Table, TV, Wardrobe")
+            expected_furniture = st.selectbox(
+                "Select the bulky item type you are uploading",
+                ["bed image", "chair image", "fridge image", "sofa image", "table image", "tv image", "wardrobe image"]
+            )
+        
         file = st.file_uploader("Upload garbage image", type=["jpg","png","jpeg"])
         
         if file:
