@@ -277,30 +277,38 @@ elif st.session_state.role == "USER" and st.session_state.user:
             arr = np.expand_dims(np.array(img)/255.0, axis=0)
             
             try:
-                pred = model.predict(arr)
+                pred = model.predict(arr, verbose=0)
                 confidence = float(np.max(pred))
                 index = np.argmax(pred)
-                result = labels[index]
 
-                st.write("Raw Prediction Vector:", pred)
-                st.write("Confidence:", confidence)
-                st.success(f"Prediction Result: {result}")
+                if index >= len(labels):
+                    st.error("Prediction error: label mismatch")
+                else:
+                    result = labels[index]
 
-            except Exception as e:
-                st.error(f"Prediction failed: {e}")
-            
-            # CREATE PENDING REWARD
-            conn = sqlite3.connect(DB_PATH)
-            c = conn.cursor()
-            c.execute("INSERT INTO rewards VALUES (NULL, ?, ?, ?, ?)",
-                      (st.session_state.user, 10, "PENDING", None))
-            conn.commit()
-            conn.close()
-            st.session_state.reward_pending = True
-            
-            if st.button("Check Reward"):
-                st.session_state.show_reward = True
-                st.experimental_rerun()
+                    st.success(f"Prediction Result: {result}")
+                    st.info(f"Confidence: {confidence * 100:.2f}%")
+
+                    if confidence >= 0.70:
+                        conn = sqlite3.connect(DB_PATH)
+                        c = conn.cursor()
+                        c.execute(
+                            "INSERT INTO rewards (user_email, points, status, station) VALUES (?, ?, ?, ?)",
+                            (st.session_state.user, 10, "PENDING", None)
+                        )
+                        conn.commit()
+                        conn.close()
+
+                        st.session_state.reward_pending = True
+
+                        if st.button("Check Reward"):
+                            st.session_state.show_reward = True
+                            st.rerun()
+                        else:
+                            st.warning("Low confidence prediction. Reward is not given. Please try another image.")
+
+except Exception as e:
+    st.error(f"Prediction failed: {e}")
     
     # REWARD PAGE
     elif st.session_state.reward_pending or st.session_state.get("show_reward"):
