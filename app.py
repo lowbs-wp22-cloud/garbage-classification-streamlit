@@ -304,11 +304,11 @@ elif st.session_state.role == "USER" and st.session_state.user:
                         if st.button("Check Reward"):
                             st.session_state.show_reward = True
                             st.rerun()
-                        else:
-                            st.warning("Low confidence prediction. Reward is not given. Please try another image.")
+                    else:
+                        st.warning("Low confidence prediction. Reward is not given. Please try another image.")
 
-except Exception as e:
-    st.error(f"Prediction failed: {e}")
+            except Exception as e:
+                st.error(f"Prediction failed: {e}")
     
     # REWARD PAGE
     elif st.session_state.reward_pending or st.session_state.get("show_reward"):
