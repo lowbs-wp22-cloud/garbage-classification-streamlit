@@ -298,7 +298,24 @@ elif st.session_state.role == "USER" and st.session_state.user:
                     st.success(f"Prediction Result: {result}")
                     st.info(f"Confidence: {confidence * 100:.2f}%")
 
-                    if confidence >= 0.70:
+                    reward_allowed = False
+
+                    if st.session_state.category == "General Waste":
+                        if confidence >= 0.70:
+                            reward_allowed = True
+                        else:
+                            st.warning("⚠️ Low confidence. No reward given. Please try another image.")
+
+                    else:
+                        # Furniture logic: must be high confidence AND match selected bulky type
+                        if confidence < 0.85:
+                            st.warning("⚠️ Low confidence for bulky item. No reward given. Please try another image.")
+                        elif result != expected_furniture:
+                            st.error("Unsupported bulky item or mismatched prediction. No reward given.")
+                        else:
+                            reward_allowed = True
+
+                    if reward_allowed:
                         conn = sqlite3.connect(DB_PATH)
                         c = conn.cursor()
                         c.execute(
@@ -313,8 +330,6 @@ elif st.session_state.role == "USER" and st.session_state.user:
                         if st.button("Check Reward"):
                             st.session_state.show_reward = True
                             st.rerun()
-                    else:
-                        st.warning("Low confidence prediction. Reward is not given. Please try another image.")
 
             except Exception as e:
                 st.error(f"Prediction failed: {e}")
