@@ -165,6 +165,7 @@ if st.session_state.role == "ADMIN" and st.session_state.user is None:
             conn.close()
             if row and check_password_hash(row[0], password):
                 st.session_state.user = staff_id
+                st.session_state.page = "Home"
                 st.success("ADMIN login successful!")
                 st.rerun()
             else:
