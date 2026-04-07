@@ -50,14 +50,19 @@ def init_db():
     )
     """)
     
-    # Rewards table
+    # Pickup Requests table
     c.execute("""
-    CREATE TABLE IF NOT EXISTS rewards (
+    CREATE TABLE IF NOT EXISTS pickup_requests (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_email TEXT,
-        points INTEGER,
+        predicted_label TEXT,
+        confidence REAL,
+        address TEXT,
+        pickup_date TEXT,
+        pickup_time_slot TEXT,
+        note TEXT,
         status TEXT,
-        station TEXT
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
     
