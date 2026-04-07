@@ -378,8 +378,21 @@ elif st.session_state.role == "USER" and st.session_state.user:
                         elif result != expected_furniture:
                             st.error("Unsupported bulky item or mismatched prediction. No pickup request created.")
                         else:
-                            st.success("✅ Bulky waste validated successfully.")
-                            st.info("Pickup request flow will be added in the next step.")
+                            conn = sqlite3.connect(DB_PATH)
+                            c = conn.cursor()
+                            c.execute(
+                                """
+                                INSERT INTO pickup_requests
+                                (user_email, predicted_label, confidence, address, pickup_date, pickup_time_slot, note, status)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                                """,
+                                (st.session_state.user, result, confidence, None, None, None, None, "PENDING_APPROVAL")
+                            )
+                            conn.commit()
+                            conn.close()
+
+                            st.success("✅ Bulky waste request submitted successfully.")
+                            st.info("Your bulky waste request is now pending admin approval.")
 
             except Exception as e:
                 st.error(f"Prediction failed: {e}")
