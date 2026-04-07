@@ -495,3 +495,51 @@ elif st.session_state.role == "USER" and st.session_state.user:
             st.session_state.category = None
             st.session_state.show_reward = None
             st.rerun()
+            
+    elif st.session_state.page == "Pickup Scheduling":
+        st.subheader("🚚 Pickup Scheduling")
+
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("""
+            SELECT id, predicted_label, status
+            FROM pickup_requests
+            WHERE user_email=? AND status='APPROVED'
+            ORDER BY created_at DESC
+            LIMIT 1
+        """, (st.session_state.user,))
+        approved_request = c.fetchone()
+        conn.close()
+
+        if approved_request:
+            request_id, predicted_label, status = approved_request
+
+            st.info(f"Approved bulky item: {predicted_label}")
+            st.success("Your pickup request has been approved. Please schedule your pickup.")
+
+            address = st.text_area("Pickup Address")
+            pickup_date = st.date_input("Select Pickup Date")
+            pickup_time_slot = st.selectbox(
+                "Select Pickup Time Slot",
+                ["9:00 AM - 12:00 PM", "12:00 PM - 3:00 PM", "3:00 PM - 6:00 PM"]
+            )
+            note = st.text_area("Additional Note (Optional)")
+
+            if st.button("Confirm Pickup Schedule"):
+                if not address.strip():
+                    st.error("Please enter your pickup address.")
+                else:
+                    conn = sqlite3.connect(DB_PATH)
+                    c = conn.cursor()
+                    c.execute("""
+                        UPDATE pickup_requests
+                        SET address=?, pickup_date=?, pickup_time_slot=?, note=?, status='SCHEDULED'
+                        WHERE id=?
+                    """, (address, str(pickup_date), pickup_time_slot, note, request_id))
+                    conn.commit()
+                    conn.close()
+
+                    st.success("✅ Pickup scheduled successfully!")
+                    st.rerun()
+        else:
+            st.info("No approved pickup request available for scheduling yet.")
