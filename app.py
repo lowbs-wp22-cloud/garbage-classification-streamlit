@@ -387,7 +387,9 @@ elif st.session_state.role == "USER" and st.session_state.user:
                 st.warning("Waiting for ADMIN approval...")
             elif status == "APPROVED":
                 st.success(f"Reward Approved! Delivered to: {station}")
-        
+        else:
+            st.info("No reward record found yet.")
+            
         station = st.selectbox(
             "Choose nearby recycling station",
             ["EcoPoint Center", "GreenCycle Hub", "City Recycling Station"]
