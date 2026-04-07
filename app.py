@@ -230,7 +230,13 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
                 st.success("Sign Up successful! Please login.")
             else:
                 st.error("Email already registered")
-
+# =============================
+# LOGOUT HANDLER
+# =============================
+if st.session_state.page == "Logout":
+    for key in ["role", "user", "category", "reward_pending", "show_reward", "page"]:
+        st.session_state[key] = None
+    st.rerun()
 # =============================
 # ADMIN DASHBOARD
 # =============================
