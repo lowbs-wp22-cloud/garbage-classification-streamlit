@@ -276,28 +276,26 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
 # =============================
 elif st.session_state.role == "USER" and st.session_state.user:
     st.title("♻️ Smart Recycling Reward System")
-    
+
     if st.session_state.page == "Home":
         st.subheader("Welcome")
         st.write("Welcome to the Smart Recycling Reward System.")
         st.write("Use the sidebar to navigate through the system.")
-        
-    # CATEGORY SELECTION
+
     elif st.session_state.page == "Upload Waste" and st.session_state.category is None:
         st.subheader("Select Category")
         category = st.radio("Choose waste type", ["General Waste", "Furniture"])
         if st.button("Continue"):
             st.session_state.category = category
             st.rerun()
-    
-    # IMAGE UPLOAD & PREDICT
+
     elif st.session_state.page == "Upload Waste" and st.session_state.reward_pending is None:
         st.subheader("Upload Image")
 
         if st.button("Change Waste Category"):
             st.session_state.category = None
             st.rerun()
-            
+
         expected_furniture = None
         if st.session_state.category == "Furniture":
             st.info("Supported bulky categories: Bed, Chair, Fridge, Sofa, Table, TV, Wardrobe")
@@ -305,13 +303,13 @@ elif st.session_state.role == "USER" and st.session_state.user:
                 "Select the bulky item type you are uploading",
                 ["bed image", "chair image", "fridge image", "sofa image", "table image", "tv image", "wardrobe image"]
             )
-        
-        file = st.file_uploader("Upload garbage image", type=["jpg","png","jpeg"])
-        
+
+        file = st.file_uploader("Upload garbage image", type=["jpg", "png", "jpeg"])
+
         if file:
             image = Image.open(file).convert("RGB")
             st.image(image, use_container_width=True)
-            
+
             if st.session_state.category == "General Waste":
                 model = load_garbage_model()
                 labels = ["Paper", "Plastic", "Metal", "Glass", "Cardboard", "Trash"]
@@ -326,73 +324,74 @@ elif st.session_state.role == "USER" and st.session_state.user:
                     "tv image",
                     "wardrobe image"
                 ]
-            
+
             img = image.resize((224, 224))
-            arr = np.expand_dims(np.array(img)/255.0, axis=0)
+            arr = np.expand_dims(np.array(img) / 255.0, axis=0)
 
-try:
-    pred = model.predict(arr, verbose=0)
-    confidence = float(np.max(pred))
-    index = np.argmax(pred)
+            try:
+                pred = model.predict(arr, verbose=0)
+                confidence = float(np.max(pred))
+                index = np.argmax(pred)
 
-    if index >= len(labels):
-        st.error("Prediction error: label mismatch")
-    else:
-        result = labels[index]
+                if index >= len(labels):
+                    st.error("Prediction error: label mismatch")
+                else:
+                    result = labels[index]
 
-        st.success(f"Prediction Result: {result}")
-        st.info(f"Confidence: {confidence * 100:.2f}%")
+                    st.success(f"Prediction Result: {result}")
+                    st.info(f"Confidence: {confidence * 100:.2f}%")
 
-        # =============================
-        # GENERAL WASTE LOGIC
-        # =============================
-        if st.session_state.category == "General Waste":
-            if confidence >= 0.70:
-                conn = sqlite3.connect(DB_PATH)
-                c = conn.cursor()
-                c.execute(
-                    "INSERT INTO rewards (user_email, points, status, station) VALUES (?, ?, ?, ?)",
-                    (st.session_state.user, 10, "PENDING", None)
-                )
-                conn.commit()
-                conn.close()
+                    # =============================
+                    # GENERAL WASTE LOGIC
+                    # =============================
+                    if st.session_state.category == "General Waste":
+                        if confidence >= 0.70:
+                            conn = sqlite3.connect(DB_PATH)
+                            c = conn.cursor()
+                            c.execute(
+                                "INSERT INTO rewards (user_email, points, status, station) VALUES (?, ?, ?, ?)",
+                                (st.session_state.user, 10, "PENDING", None)
+                            )
+                            conn.commit()
+                            conn.close()
 
-                st.session_state.reward_pending = True
-                st.success("✅ 10 points added successfully.")
+                            st.session_state.reward_pending = True
+                            st.success("✅ 10 points added successfully.")
 
-                if st.button("Check Reward"):
-                    st.session_state.show_reward = True
-                    st.rerun()
-            else:
-                st.warning("⚠️ Low confidence. No reward given. Please try another image.")
+                            if st.button("Check Reward"):
+                                st.session_state.show_reward = True
+                                st.rerun()
+                        else:
+                            st.warning("⚠️ Low confidence. No reward given. Please try another image.")
 
-        # =============================
-        # BULKY WASTE LOGIC
-        # =============================
-        elif st.session_state.category == "Furniture":
-            if confidence < 0.85:
-                st.warning("⚠️ Low confidence for bulky item. No pickup request created. Please try another image.")
-            elif result != expected_furniture:
-                st.error("Unsupported bulky item or mismatched prediction. No pickup request created.")
-            else:
-                st.success("✅ Bulky waste validated successfully.")
-                st.info("Pickup request flow will be added in the next step.")
+                    # =============================
+                    # BULKY WASTE LOGIC
+                    # =============================
+                    elif st.session_state.category == "Furniture":
+                        if confidence < 0.85:
+                            st.warning("⚠️ Low confidence for bulky item. No pickup request created. Please try another image.")
+                        elif result != expected_furniture:
+                            st.error("Unsupported bulky item or mismatched prediction. No pickup request created.")
+                        else:
+                            st.success("✅ Bulky waste validated successfully.")
+                            st.info("Pickup request flow will be added in the next step.")
 
-except Exception as e:
-    st.error(f"Prediction failed: {e}")    
-    
-    # REWARD PAGE
+            except Exception as e:
+                st.error(f"Prediction failed: {e}")
+
     elif st.session_state.page == "Reward Status":
         st.subheader("🎁 Reward Status")
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
-        c.execute("SELECT points, status, station FROM rewards WHERE user_email=? ORDER BY id DESC LIMIT 1",
-                  (st.session_state.user,))
+        c.execute(
+            "SELECT points, status, station FROM rewards WHERE user_email=? ORDER BY id DESC LIMIT 1",
+            (st.session_state.user,)
+        )
         reward = c.fetchone()
         conn.close()
 
         status = None
-        
+
         if reward:
             points, status, station = reward
             st.info(f"You earned **{points} points** (Status: {status})")
@@ -402,17 +401,19 @@ except Exception as e:
                 st.success(f"Reward Approved! Delivered to: {station}")
         else:
             st.info("No reward record found yet.")
-            
+
         station = st.selectbox(
             "Choose nearby recycling station",
             ["EcoPoint Center", "GreenCycle Hub", "City Recycling Station"]
         )
-        
+
         if reward and st.button("Confirm Delivery") and status == "APPROVED":
             conn = sqlite3.connect(DB_PATH)
             c = conn.cursor()
-            c.execute("UPDATE rewards SET station=? WHERE user_email=? AND status='APPROVED'",
-                      (station, st.session_state.user))
+            c.execute(
+                "UPDATE rewards SET station=? WHERE user_email=? AND status='APPROVED'",
+                (station, st.session_state.user)
+            )
             conn.commit()
             conn.close()
             st.success("✅ Delivery confirmed!")
