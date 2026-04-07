@@ -276,15 +276,15 @@ elif st.session_state.role == "USER" and st.session_state.user:
         st.write("Use the sidebar to navigate through the system.")
         
     # CATEGORY SELECTION
-        elif st.session_state.page == "Upload Waste" and st.session_state.category is None:
-            st.subheader("Select Category")
-            category = st.radio("Choose waste type", ["General Waste", "Furniture"])
-            if st.button("Continue"):
-                st.session_state.category = category
-                st.rerun()
+    elif st.session_state.page == "Upload Waste" and st.session_state.category is None:
+        st.subheader("Select Category")
+        category = st.radio("Choose waste type", ["General Waste", "Furniture"])
+        if st.button("Continue"):
+            st.session_state.category = category
+            st.rerun()
     
     # IMAGE UPLOAD & PREDICT
-        elif st.session_state.page == "Upload Waste" and st.session_state.reward_pending is None:
+    elif st.session_state.page == "Upload Waste" and st.session_state.reward_pending is None:
         st.subheader("Upload Image")
         
         expected_furniture = None
