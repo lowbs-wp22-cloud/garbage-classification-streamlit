@@ -293,7 +293,11 @@ elif st.session_state.role == "USER" and st.session_state.user:
     # IMAGE UPLOAD & PREDICT
     elif st.session_state.page == "Upload Waste" and st.session_state.reward_pending is None:
         st.subheader("Upload Image")
-        
+
+        if st.button("Change Waste Category"):
+            st.session_state.category = None
+            st.rerun()
+            
         expected_furniture = None
         if st.session_state.category == "Furniture":
             st.info("Supported bulky categories: Bed, Chair, Fridge, Sofa, Table, TV, Wardrobe")
