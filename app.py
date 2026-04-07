@@ -80,7 +80,7 @@ def load_furniture_model():
 # =============================
 # SESSION STATE DEFAULTS
 # =============================
-for key in ["role","user","category","reward_pending","show_reward"]:
+for key in ["role", "user", "category", "reward_pending", "show_reward", "page"]:
     if key not in st.session_state:
         st.session_state[key] = None
 
@@ -108,7 +108,28 @@ def signup_user(name, email, password):
     conn.commit()
     conn.close()
     return True
+# =============================
+# SIDEBAR NAVIGATION
+# =============================
+if st.session_state.user:
+    with st.sidebar:
+        st.title("Navigation")
 
+        if st.session_state.role == "USER":
+            page = st.radio(
+                "Go to",
+                ["Home", "Upload Waste", "Reward Status", "Logout"],
+                key="user_page_nav"
+            )
+            st.session_state.page = page
+
+        elif st.session_state.role == "ADMIN":
+            page = st.radio(
+                "Go to",
+                ["Home", "Pending Rewards", "Logout"],
+                key="admin_page_nav"
+            )
+            st.session_state.page = page
 # =============================
 # ROLE SELECTION (FIXED)
 # =============================
