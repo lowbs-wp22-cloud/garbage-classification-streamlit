@@ -270,16 +270,21 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
 elif st.session_state.role == "USER" and st.session_state.user:
     st.title("♻️ Smart Recycling Reward System")
     
+    if st.session_state.page == "Home":
+        st.subheader("Welcome")
+        st.write("Welcome to the Smart Recycling Reward System.")
+        st.write("Use the sidebar to navigate through the system.")
+        
     # CATEGORY SELECTION
-    if st.session_state.category is None:
-        st.subheader("Select Category")
-        category = st.radio("Choose waste type", ["General Waste", "Furniture"])
-        if st.button("Continue"):
-            st.session_state.category = category
-            st.rerun()
+        elif st.session_state.page == "Upload Waste" and st.session_state.category is None:
+            st.subheader("Select Category")
+            category = st.radio("Choose waste type", ["General Waste", "Furniture"])
+            if st.button("Continue"):
+                st.session_state.category = category
+                st.rerun()
     
     # IMAGE UPLOAD & PREDICT
-    elif st.session_state.reward_pending is None:
+        elif st.session_state.page == "Upload Waste" and st.session_state.reward_pending is None:
         st.subheader("Upload Image")
         
         expected_furniture = None
@@ -364,7 +369,7 @@ elif st.session_state.role == "USER" and st.session_state.user:
                 st.error(f"Prediction failed: {e}")
     
     # REWARD PAGE
-    elif st.session_state.reward_pending or st.session_state.get("show_reward"):
+    elif st.session_state.page == "Reward Status":
         st.subheader("🎁 Reward Status")
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
