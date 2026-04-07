@@ -241,28 +241,35 @@ if st.session_state.page == "Logout":
 # ADMIN DASHBOARD
 # =============================
 elif st.session_state.role == "ADMIN" and st.session_state.user:
-    st.title("Admin Dashboard - Pending Rewards")
-    
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("SELECT id, user_email, points, status, station FROM rewards WHERE status='PENDING'")
-    pending_rewards = c.fetchall()
-    conn.close()
-    
-    if pending_rewards:
-        for reward in pending_rewards:
-            reward_id, user_email, points, status, station = reward
-            st.write(f"**User:** {user_email} | **Points:** {points} | **Status:** {status} | **Station:** {station}")
-            if st.button(f"APPROVE {reward_id}", key=f"approve_{reward_id}"):
-                conn = sqlite3.connect(DB_PATH)
-                c = conn.cursor()
-                c.execute("UPDATE rewards SET status='APPROVED' WHERE id=?", (reward_id,))
-                conn.commit()
-                conn.close()
-                st.success(f"Reward for {user_email} approved!")
-                st.rerun()
-    else:
-        st.info("No pending rewards.")
+
+    if st.session_state.page == "Home":
+        st.title("Admin Dashboard")
+        st.write("Welcome, Admin.")
+        st.write("Use the sidebar to manage the system.")
+
+    elif st.session_state.page == "Pending Rewards":
+        st.title("Admin Dashboard - Pending Rewards")
+
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("SELECT id, user_email, points, status, station FROM rewards WHERE status='PENDING'")
+        pending_rewards = c.fetchall()
+        conn.close()
+
+        if pending_rewards:
+            for reward in pending_rewards:
+                reward_id, user_email, points, status, station = reward
+                st.write(f"**User:** {user_email} | **Points:** {points} | **Status:** {status} | **Station:** {station}")
+                if st.button(f"APPROVE {reward_id}", key=f"approve_{reward_id}"):
+                    conn = sqlite3.connect(DB_PATH)
+                    c = conn.cursor()
+                    c.execute("UPDATE rewards SET status='APPROVED' WHERE id=?", (reward_id,))
+                    conn.commit()
+                    conn.close()
+                    st.success(f"Reward for {user_email} approved!")
+                    st.rerun()
+        else:
+            st.info("No pending rewards.")
 
 # =============================
 # USER FLOW
