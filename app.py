@@ -208,6 +208,7 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
         if st.button("Login"):
             if login_user(email, password):
                 st.session_state.user = email
+                st.session_state.page = "Home"
                 st.success("USER login successful!")
                 st.rerun()
             else:
