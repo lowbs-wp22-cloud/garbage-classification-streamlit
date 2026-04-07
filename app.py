@@ -377,6 +377,8 @@ elif st.session_state.role == "USER" and st.session_state.user:
                   (st.session_state.user,))
         reward = c.fetchone()
         conn.close()
+
+        status = None
         
         if reward:
             points, status, station = reward
@@ -391,7 +393,7 @@ elif st.session_state.role == "USER" and st.session_state.user:
             ["EcoPoint Center", "GreenCycle Hub", "City Recycling Station"]
         )
         
-        if st.button("Confirm Delivery") and status == "APPROVED":
+        if reward and st.button("Confirm Delivery") and status == "APPROVED":
             conn = sqlite3.connect(DB_PATH)
             c = conn.cursor()
             c.execute("UPDATE rewards SET station=? WHERE user_email=? AND status='APPROVED'",
@@ -402,3 +404,4 @@ elif st.session_state.role == "USER" and st.session_state.user:
             st.session_state.reward_pending = None
             st.session_state.category = None
             st.session_state.show_reward = None
+            st.rerun()
