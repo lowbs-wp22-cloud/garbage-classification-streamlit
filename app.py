@@ -275,7 +275,63 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
                     st.rerun()
         else:
             st.info("No pending rewards.")
+            
+    elif st.session_state.page == "Pickup Requests":
+        st.title("Admin Dashboard - Pickup Requests")
 
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("""
+            SELECT id, user_email, predicted_label, confidence, status, created_at
+            FROM pickup_requests
+            WHERE status = 'PENDING_APPROVAL'
+            ORDER BY created_at DESC
+        """)
+        pickup_requests = c.fetchall()
+        conn.close()
+
+        if pickup_requests:
+            for request in pickup_requests:
+                request_id, user_email, predicted_label, confidence, status, created_at = request
+
+                st.write(f"**Request ID:** {request_id}")
+                st.write(f"**User:** {user_email}")
+                st.write(f"**Predicted Item:** {predicted_label}")
+                st.write(f"**Confidence:** {confidence * 100:.2f}%")
+                st.write(f"**Status:** {status}")
+                st.write(f"**Created At:** {created_at}")
+
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    if st.button(f"APPROVE PICKUP {request_id}", key=f"approve_pickup_{request_id}"):
+                        conn = sqlite3.connect(DB_PATH)
+                        c = conn.cursor()
+                        c.execute(
+                            "UPDATE pickup_requests SET status='APPROVED' WHERE id=?",
+                            (request_id,)
+                        )
+                        conn.commit()
+                        conn.close()
+                        st.success(f"Pickup request {request_id} approved!")
+                        st.rerun()
+
+                with col2:
+                    if st.button(f"REJECT PICKUP {request_id}", key=f"reject_pickup_{request_id}"):
+                        conn = sqlite3.connect(DB_PATH)
+                        c = conn.cursor()
+                        c.execute(
+                            "UPDATE pickup_requests SET status='REJECTED' WHERE id=?",
+                            (request_id,)
+                        )
+                        conn.commit()
+                        conn.close()
+                        st.warning(f"Pickup request {request_id} rejected.")
+                        st.rerun()
+
+                st.markdown("---")
+        else:
+            st.info("No pending pickup requests.")     
 # =============================
 # USER FLOW
 # =============================
