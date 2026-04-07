@@ -329,55 +329,57 @@ elif st.session_state.role == "USER" and st.session_state.user:
             
             img = image.resize((224, 224))
             arr = np.expand_dims(np.array(img)/255.0, axis=0)
-            
-            try:
-                pred = model.predict(arr, verbose=0)
-                confidence = float(np.max(pred))
-                index = np.argmax(pred)
 
-                if index >= len(labels):
-                    st.error("Prediction error: label mismatch")
-                else:
-                    result = labels[index]
+try:
+    pred = model.predict(arr, verbose=0)
+    confidence = float(np.max(pred))
+    index = np.argmax(pred)
 
-                    st.success(f"Prediction Result: {result}")
-                    st.info(f"Confidence: {confidence * 100:.2f}%")
+    if index >= len(labels):
+        st.error("Prediction error: label mismatch")
+    else:
+        result = labels[index]
 
-                    reward_allowed = False
+        st.success(f"Prediction Result: {result}")
+        st.info(f"Confidence: {confidence * 100:.2f}%")
 
-                    if st.session_state.category == "General Waste":
-                        if confidence >= 0.70:
-                            reward_allowed = True
-                        else:
-                            st.warning("⚠️ Low confidence. No reward given. Please try another image.")
+        # =============================
+        # GENERAL WASTE LOGIC
+        # =============================
+        if st.session_state.category == "General Waste":
+            if confidence >= 0.70:
+                conn = sqlite3.connect(DB_PATH)
+                c = conn.cursor()
+                c.execute(
+                    "INSERT INTO rewards (user_email, points, status, station) VALUES (?, ?, ?, ?)",
+                    (st.session_state.user, 10, "PENDING", None)
+                )
+                conn.commit()
+                conn.close()
 
-                    else:
-                        # Furniture logic: must be high confidence AND match selected bulky type
-                        if confidence < 0.85:
-                            st.warning("⚠️ Low confidence for bulky item. No reward given. Please try another image.")
-                        elif result != expected_furniture:
-                            st.error("Unsupported bulky item or mismatched prediction. No reward given.")
-                        else:
-                            reward_allowed = True
+                st.session_state.reward_pending = True
+                st.success("✅ 10 points added successfully.")
 
-                    if reward_allowed:
-                        conn = sqlite3.connect(DB_PATH)
-                        c = conn.cursor()
-                        c.execute(
-                            "INSERT INTO rewards (user_email, points, status, station) VALUES (?, ?, ?, ?)",
-                            (st.session_state.user, 10, "PENDING", None)
-                        )
-                        conn.commit()
-                        conn.close()
+                if st.button("Check Reward"):
+                    st.session_state.show_reward = True
+                    st.rerun()
+            else:
+                st.warning("⚠️ Low confidence. No reward given. Please try another image.")
 
-                        st.session_state.reward_pending = True
+        # =============================
+        # BULKY WASTE LOGIC
+        # =============================
+        elif st.session_state.category == "Furniture":
+            if confidence < 0.85:
+                st.warning("⚠️ Low confidence for bulky item. No pickup request created. Please try another image.")
+            elif result != expected_furniture:
+                st.error("Unsupported bulky item or mismatched prediction. No pickup request created.")
+            else:
+                st.success("✅ Bulky waste validated successfully.")
+                st.info("Pickup request flow will be added in the next step.")
 
-                        if st.button("Check Reward"):
-                            st.session_state.show_reward = True
-                            st.rerun()
-
-            except Exception as e:
-                st.error(f"Prediction failed: {e}")
+except Exception as e:
+    st.error(f"Prediction failed: {e}")    
     
     # REWARD PAGE
     elif st.session_state.page == "Reward Status":
