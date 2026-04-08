@@ -337,7 +337,7 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
 
     if st.session_state.page == "Home":
         # =============================
-        # HERO BANNER
+        # HERO BANNER 
         # =============================
         st.markdown("""
         <div style="
@@ -569,9 +569,36 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
 # USER FLOW
 # =============================
 elif st.session_state.role == "USER" and st.session_state.user:
-    st.title("♻️ Smart Recycling Reward System")
 
     if st.session_state.page == "Home":
+        # =============================
+        # HERO BANNER 
+        # =============================
+        st.markdown("""
+        <div style="
+            background-image: url('https://images.unsplash.com/photo-1604187351574-c75ca79f5807');
+            height: 300px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 12px;
+            position: relative;
+            margin-bottom: 20px;
+        ">
+            <div style="
+                position: absolute;
+                bottom: 20px;
+                left: 30px;
+                color: white;
+            ">
+                <h1 style="margin-bottom:5px;">♻️ Smart Recycling Reward System</h1>
+                <p style="font-size:18px;">Earn rewards while saving the environment</p>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # spacing
+        st.markdown("<br>", unsafe_allow_html=True)      
+
         st.markdown("## ♻️ Smart Recycling Reward System")
         st.markdown("### Welcome to your recycling dashboard")
 
