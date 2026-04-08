@@ -103,12 +103,12 @@ def load_furniture_model():
     # download model if not exists
     if not os.path.exists(model_path):
         model_url = "18e-LMCD635Grz6LxlGlhVt20UL60lVCo"
-        gdown.download(f"https://drive.google.com/uc?id=18e-LMCD635Grz6LxlGlhVt20UL60lVCo", model_path, quiet=False)
+        gdown.download(f"https://drive.google.com/uc?id={model_url}", model_path, quiet=False)
 
     # download labels if not exists
     if not os.path.exists(labels_path):
         labels_url = "1OAb0O3nvgiB6q_Xn_8naU4oVGkPFrYwd"
-        gdown.download(f"https://drive.google.com/uc?id=1OAb0O3nvgiB6q_Xn_8naU4oVGkPFrYwd", labels_path, quiet=False)
+        gdown.download(f"https://drive.google.com/uc?id={labels_url}", labels_path, quiet=False)
 
     model = tf.keras.models.load_model(model_path)
 
