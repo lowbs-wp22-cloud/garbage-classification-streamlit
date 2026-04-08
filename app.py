@@ -689,4 +689,33 @@ elif st.session_state.role == "USER" and st.session_state.user:
                 st.warning("Not enough points to redeem this reward.")
 
             st.markdown("---")
+            
+        elif st.session_state.page == "Redemption History":
+        st.subheader("🧾 Redemption History")
+
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("""
+            SELECT reward_name, points_used, status, created_at
+            FROM redemptions
+            WHERE user_email=?
+            ORDER BY created_at DESC
+        """, (st.session_state.user,))
+        redemption_history = c.fetchall()
+        conn.close()
+
+        if redemption_history:
+            total_spent = sum(record[1] for record in redemption_history)
+            st.info(f"Total Points Spent: {total_spent}")
+
+            for record in redemption_history:
+                reward_name, points_used, status, created_at = record
+
+                st.write(f"**Reward:** {reward_name}")
+                st.write(f"**Points Used:** {points_used}")
+                st.write(f"**Status:** {status}")
+                st.write(f"**Redeemed At:** {created_at}")
+                st.markdown("---")
+        else:
+            st.info("No redemption history found yet.")
  
