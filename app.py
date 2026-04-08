@@ -501,10 +501,10 @@ elif st.session_state.role == "USER" and st.session_state.user:
 
         expected_furniture = None
         if st.session_state.category == "Furniture":
-            st.info("Supported bulky categories: Bed, Chair, Fridge, Sofa, Table, TV, Wardrobe")
+            st.info("Supported bulky categories: Chair, Fridge, Table, TV, Wardrobe")
             expected_furniture = st.selectbox(
                 "Select the bulky item type you are uploading",
-                ["bed image", "chair image", "fridge image", "sofa image", "table image", "tv image", "wardrobe image"]
+                ["chair image", "fridge image", "table image", "tv image", "wardrobe image"]
             )
 
         file = st.file_uploader("Upload garbage image", type=["jpg", "png", "jpeg"])
@@ -517,16 +517,7 @@ elif st.session_state.role == "USER" and st.session_state.user:
                 model = load_garbage_model()
                 labels = ["Paper", "Plastic", "Metal", "Glass", "Cardboard", "Trash"]
             else:
-                model = load_furniture_model()
-                labels = [
-                    "bed image",
-                    "chair image",
-                    "fridge image",
-                    "sofa image",
-                    "table image",
-                    "tv image",
-                    "wardrobe image"
-                ]
+                model, labels = load_furniture_model()
 
             img = image.resize((224, 224))
             arr = np.expand_dims(np.array(img) / 255.0, axis=0)
