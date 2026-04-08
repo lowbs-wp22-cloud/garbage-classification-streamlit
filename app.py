@@ -649,7 +649,7 @@ elif st.session_state.role == "USER" and st.session_state.user:
 
         with nav4:
             st.markdown('<div class="nav-link">', unsafe_allow_html=True)
-            if st.button("HOW IT WORKS", use_container_width=True, key="nav_how"):
+            if st.button("HOW IT WORKS", help="How the system works", use_container_width=True, key="nav_how"):
                 st.session_state.page = "Upload Waste"
                 st.rerun()
             st.markdown('</div>', unsafe_allow_html=True)
