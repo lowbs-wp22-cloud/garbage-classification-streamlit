@@ -13,6 +13,18 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 # CUSTOM CSS (UI DESIGN)
 # =============================
 st.markdown("""
+<div style='
+    background-color:#7cb342;
+    padding:10px;
+    text-align:center;
+    color:white;
+    font-size:14px;
+'>
+    🌱 Smart Recycling System: Promoting sustainability and rewarding eco-friendly actions.
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("""
 <style>
 /* Main background */
 [data-testid="stAppViewContainer"] {
