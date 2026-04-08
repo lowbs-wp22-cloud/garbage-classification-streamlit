@@ -8,11 +8,7 @@ import os
 import gdown
 from tensorflow.keras.models import load_model
 
-def load_bulky_model():
-    if not os.path.exists("bulky_classifier.h5"):
-        url = "https://drive.google.com/uc?id=1WmiUE5u7BmeTlSJYVREf6gd9U2S2l_Og"
-        gdown.download(url, "bulky_classifier.h5", quiet=False)
-    return load_model("bulky_classifier.h5")
+
 
 bulky_model = load_bulky_model()
 # =============================
