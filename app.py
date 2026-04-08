@@ -12,49 +12,6 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 # =============================
 # CUSTOM CSS (UI DESIGN)
 # =============================
-st.markdown("""
-<style>
-/* ===== NAVBAR ROW TUNING ===== */
-.nav-logo {
-    font-size: 22px;
-    font-weight: 800;
-    color: #2fa4dc;
-    letter-spacing: 1px;
-}
-
-.nav-link button {
-    background: transparent !important;
-    border: none !important;
-    color: #7b8794 !important;
-    font-weight: 700 !important;
-    font-size: 15px !important;
-    box-shadow: none !important;
-    padding-top: 10px !important;
-    padding-bottom: 10px !important;
-}
-
-.nav-link button:hover {
-    color: #2fa4dc !important;
-    background: transparent !important;
-}
-
-.nav-cta button {
-    background-color: #4aa3df !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 6px !important;
-    font-weight: 700 !important;
-    font-size: 15px !important;
-    padding-top: 10px !important;
-    padding-bottom: 10px !important;
-}
-
-.nav-cta button:hover {
-    background-color: #3b94d1 !important;
-    color: white !important;
-}
-</style>
-""", unsafe_allow_html=True)
 
 st.markdown("""
 <style>
@@ -638,51 +595,6 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
 elif st.session_state.role == "USER" and st.session_state.user:
 
     if st.session_state.page == "Home":
-        # =============================
-        # NAVBAR (REPLACE OLD ONE WITH THIS)
-        # =============================
-        nav1, nav2, nav3, nav4, nav5, nav6 = st.columns([2.8, 1, 1, 1.4, 1.8, 1.4])
-
-        with nav1:
-            st.markdown('<div class="nav-logo">♻️ SMART RECYCLING</div>', unsafe_allow_html=True)
-
-        with nav2:
-            st.markdown('<div class="nav-link">', unsafe_allow_html=True)
-            if st.button("HOME", use_container_width=True, key="nav_home"):
-                st.session_state.page = "Home"
-                st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
-
-        with nav3:
-            st.markdown('<div class="nav-link">', unsafe_allow_html=True)
-            if st.button("ABOUT", use_container_width=True, key="nav_about"):
-                st.session_state.page = "Profile"
-                st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
-
-        with nav4:
-            st.markdown('<div class="nav-link">', unsafe_allow_html=True)
-            if st.button("HOW IT WORKS", use_container_width=True, key="nav_how"):
-                st.session_state.page = "Upload Waste"
-                st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
-
-        with nav5:
-            st.markdown('<div class="nav-link">', unsafe_allow_html=True)
-            if st.button("PARTNER BENEFITS", use_container_width=True, key="nav_partner"):
-                st.session_state.page = "Reward Status"
-                st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
-
-        with nav6:
-            st.markdown('<div class="nav-cta">', unsafe_allow_html=True)
-            if st.button("INSTANT QUOTE", use_container_width=True, key="nav_quote"):
-                st.session_state.page = "Redeem Rewards"
-                st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
-
-        st.markdown("<hr style='margin-top:10px; margin-bottom:20px;'>", unsafe_allow_html=True)
-        
         # =============================
         # HERO BANNER 
         # =============================
