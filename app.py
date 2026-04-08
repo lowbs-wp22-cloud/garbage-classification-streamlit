@@ -278,82 +278,91 @@ if st.session_state.role is None:
 
     st.markdown("""
     <style>
-
-    .landing {
-        position: relative;
-        height: 100vh;
-        width: 100%;
-        background-image: url("https://images.unsplash.com/photo-1621451537084-482c73073a0f");
+    [data-testid="stAppViewContainer"] {
+        background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+                          url("https://images.unsplash.com/photo-1621451537084-482c73073a0f");
         background-size: cover;
         background-position: center;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
     }
 
-    .overlay {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.6);
+    [data-testid="stHeader"] {
+        background: rgba(0,0,0,0);
     }
 
-    .center-content {
-        position: relative;
+    .role-title {
         text-align: center;
         color: white;
-        z-index: 2;
-    }
-
-    .title {
-        font-size: 48px;
-        font-weight: 900;
+        font-size: 54px;
+        font-weight: 800;
         margin-bottom: 10px;
     }
 
-    .subtitle {
-        font-size: 20px;
+    .role-subtitle {
+        text-align: center;
+        color: white;
+        font-size: 22px;
         margin-bottom: 30px;
     }
 
-    .btn button {
-        background-color: rgba(76, 175, 80, 0.9) !important;
-        color: white !important;
-        border-radius: 8px !important;
-        font-size: 16px !important;
-        padding: 12px !important;
+    .role-box {
+        background: rgba(255,255,255,0.12);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255,255,255,0.25);
+        border-radius: 18px;
+        padding: 40px 30px;
+        max-width: 900px;
+        margin: 0 auto;
     }
 
-    .btn button:hover {
+    .role-note {
+        text-align: center;
+        color: rgba(255,255,255,0.9);
+        font-size: 16px;
+        margin-bottom: 25px;
+    }
+
+    div[data-testid="stButton"] button {
+        height: 55px !important;
+        font-size: 18px !important;
+        font-weight: 700 !important;
+        border-radius: 12px !important;
+        border: none !important;
         background-color: #43a047 !important;
+        color: white !important;
     }
 
+    div[data-testid="stButton"] button:hover {
+        background-color: #2e7d32 !important;
+        color: white !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-    # MAIN CONTAINER
-    st.markdown('<div class="landing"><div class="overlay"></div><div class="center-content">', unsafe_allow_html=True)
+    st.markdown("<div style='height:18vh;'></div>", unsafe_allow_html=True)
 
-    st.markdown('<div class="title">♻️ Smart Recycling System</div>', unsafe_allow_html=True)
-    st.markdown('<div class="subtitle">Promoting sustainability and rewarding eco-friendly actions</div>', unsafe_allow_html=True)
+    left, center, right = st.columns([1, 2.2, 1])
 
-    col1, col2 = st.columns(2)
+    with center:
+        st.markdown('<div class="role-box">', unsafe_allow_html=True)
+        st.markdown('<div class="role-title">♻️ Smart Recycling System</div>', unsafe_allow_html=True)
+        st.markdown('<div class="role-subtitle">Promoting sustainability and rewarding eco-friendly actions</div>', unsafe_allow_html=True)
+        st.markdown('<div class="role-note">Choose your role to continue</div>', unsafe_allow_html=True)
 
-    with col1:
-        st.markdown('<div class="btn">', unsafe_allow_html=True)
-        if st.button("👤 USER", use_container_width=True):
-            st.session_state.role = "USER"
-            st.rerun()
+        col1, col2 = st.columns(2)
+
+        with col1:
+            if st.button("👤 USER", use_container_width=True, key="landing_user"):
+                st.session_state.role = "USER"
+                st.rerun()
+
+        with col2:
+            if st.button("🛠 ADMIN", use_container_width=True, key="landing_admin"):
+                st.session_state.role = "ADMIN"
+                st.rerun()
+
         st.markdown('</div>', unsafe_allow_html=True)
-
-    with col2:
-        st.markdown('<div class="btn">', unsafe_allow_html=True)
-        if st.button("🛠 ADMIN", use_container_width=True):
-            st.session_state.role = "ADMIN"
-            st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown('</div></div>', unsafe_allow_html=True)
 
 # =============================
 # ADMIN LOGIN / SIGNUP
