@@ -113,8 +113,19 @@ h1, h2, h3 {
 
 st.markdown("""
 <style>
+.auth-bg {
+    background-image: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)),
+                      url("https://images.unsplash.com/photo-1621451537084-482c73073a0f");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 20px;
+    min-height: 80vh;
+    padding: 60px 30px;
+}
+
 .auth-page-space {
-    height: 12vh;
+    height: 4vh;
 }
 
 .auth-card {
@@ -142,18 +153,16 @@ st.markdown("""
     margin-bottom: 25px;
 }
 
-.auth-label {
-    color: white;
-    font-weight: 600;
-    margin-top: 10px;
+.auth-note {
+    text-align: center;
+    color: rgba(255,255,255,0.88);
+    margin-bottom: 20px;
 }
 
-/* make text inputs cleaner on auth pages */
 div[data-testid="stTextInput"] input {
     border-radius: 12px !important;
 }
 
-/* make auth radio text easier to see */
 div[role="radiogroup"] label {
     color: white !important;
     font-weight: 500 !important;
@@ -418,9 +427,11 @@ if st.session_state.role is None:
 # =============================
 if st.session_state.role == "ADMIN" and st.session_state.user is None:
     st.markdown("<div class='auth-page-space'></div>", unsafe_allow_html=True)
+    st.markdown("<div class='auth-bg'>", unsafe_allow_html=True)
     st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
     st.markdown("<div class='auth-title'>🛠 ADMIN Login / Sign Up</div>", unsafe_allow_html=True)
     st.markdown("<div class='auth-subtitle'>Manage rewards, pickups, approvals, and analytics</div>", unsafe_allow_html=True)
+    st.markdown("<div class='auth-note'>Choose an option to continue</div>", unsafe_allow_html=True)
 
     if st.button("← Back to Role Selection", key="back_from_admin"):
         st.session_state.role = None
@@ -470,14 +481,17 @@ if st.session_state.role == "ADMIN" and st.session_state.user is None:
                     conn.close()
                     st.success("Admin Sign Up successful! Please login.")
     st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 # =============================
 # USER LOGIN / SIGNUP
 # =============================
 elif st.session_state.role == "USER" and st.session_state.user is None:
     st.markdown("<div class='auth-page-space'></div>", unsafe_allow_html=True)
+    st.markdown("<div class='auth-bg'>", unsafe_allow_html=True)
     st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
     st.markdown("<div class='auth-title'>👤 USER Login / Sign Up</div>", unsafe_allow_html=True)
     st.markdown("<div class='auth-subtitle'>Access your recycling account and continue your sustainability journey</div>", unsafe_allow_html=True)
+    st.markdown("<div class='auth-note'>Choose an option to continue</div>", unsafe_allow_html=True)
 
     if st.button("← Back to Role Selection", key="back_from_user"):
         st.session_state.role = None
@@ -513,6 +527,7 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
                 st.success("Sign Up successful! Please login.")
             else:
                 st.error("Email already registered")
+    st.markdown("</div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 # =============================
 # LOGOUT HANDLER
