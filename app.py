@@ -292,6 +292,13 @@ if st.session_state.role is None:
 # =============================
 if st.session_state.role == "ADMIN" and st.session_state.user is None:
     st.subheader("ADMIN Login / Sign Up")
+    if st.session_state.role == "ADMIN" and st.session_state.user is None:
+    st.subheader("ADMIN Login / Sign Up")
+
+    if st.button("← Back to Role Selection", key="back_from_admin"):
+        st.session_state.role = None
+        st.rerun()
+
     option = st.radio("Choose an option", ["Login", "Sign Up"], key="admin_option")
     
     if option == "Login":
@@ -341,6 +348,13 @@ if st.session_state.role == "ADMIN" and st.session_state.user is None:
 # =============================
 elif st.session_state.role == "USER" and st.session_state.user is None:
     st.subheader("USER Login / Sign Up")
+    elif st.session_state.role == "USER" and st.session_state.user is None:
+    st.subheader("USER Login / Sign Up")
+
+    if st.button("← Back to Role Selection", key="back_from_user"):
+        st.session_state.role = None
+        st.rerun()
+
     option = st.radio("Choose an option", ["Login", "Sign Up"], key="user_option")
     
     if option == "Login":
