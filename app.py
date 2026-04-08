@@ -489,10 +489,70 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
 elif st.session_state.role == "USER" and st.session_state.user:
     st.title("♻️ Smart Recycling Reward System")
 
-    if st.session_state.page == "Home":
-        st.subheader("Welcome")
-        st.write("Welcome to the Smart Recycling Reward System.")
-        st.write("Use the sidebar to navigate through the system.")
+        if st.session_state.page == "Home":
+            st.title("♻️ Smart Recycling Reward System")
+            st.markdown("### Welcome to your recycling dashboard")
+
+            conn = sqlite3.connect(DB_PATH)
+            c = conn.cursor()
+
+            # user info
+            c.execute("SELECT name, email FROM users WHERE email=?", (st.session_state.user,))
+            user_info = c.fetchone()
+
+            # total earned points
+            c.execute("SELECT COALESCE(SUM(points), 0) FROM rewards WHERE user_email=?", (st.session_state.user,))
+            total_earned = c.fetchone()[0]
+
+            # total redeemed points
+            c.execute("SELECT COALESCE(SUM(points_used), 0) FROM redemptions WHERE user_email=?", (st.session_state.user,))
+            total_redeemed = c.fetchone()[0]
+
+            # total reward records
+            c.execute("SELECT COUNT(*) FROM rewards WHERE user_email=?", (st.session_state.user,))
+            total_reward_records = c.fetchone()[0]
+
+            # total pickup requests
+            c.execute("SELECT COUNT(*) FROM pickup_requests WHERE user_email=?", (st.session_state.user,))
+            total_pickup_requests = c.fetchone()[0]
+
+            # completed pickups
+            c.execute("SELECT COUNT(*) FROM pickup_requests WHERE user_email=? AND status='COMPLETED'", (st.session_state.user,))
+            completed_pickups = c.fetchone()[0]
+
+            # total redemptions
+            c.execute("SELECT COUNT(*) FROM redemptions WHERE user_email=?", (st.session_state.user,))
+            total_redemptions = c.fetchone()[0]
+
+            conn.close()
+
+            available_points = total_earned - total_redeemed
+
+            if user_info:
+                name, email = user_info
+
+                st.markdown(f"## 👋 Hello, {name}")
+                st.write(f"**Email:** {email}")
+
+                col1, col2, col3 = st.columns(3)
+
+                with col1:
+                    st.metric("Total Earned Points", total_earned)
+                    st.metric("Total Reward Records", total_reward_records)
+
+                with col2:
+                    st.metric("Available Points", available_points)
+                    st.metric("Pickup Requests", total_pickup_requests)
+
+                with col3:
+                    st.metric("Completed Pickups", completed_pickups)
+                    st.metric("Total Redemptions", total_redemptions)
+
+                st.markdown("---")
+                st.markdown("### Quick Guide")
+                st.info("Use the sidebar to upload waste, check reward status, schedule pickup, redeem rewards, and view your profile.")
+            else:
+                st.error("User info not found.")
 
     elif st.session_state.page == "Upload Waste" and st.session_state.category is None:
         st.subheader("Select Category")
