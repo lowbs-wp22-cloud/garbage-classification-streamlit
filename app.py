@@ -6,7 +6,8 @@ from PIL import Image
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import gdown
-from tensorflow.keras.models import load_model
+import json
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 
 # =============================
 # PAGE CONFIG
