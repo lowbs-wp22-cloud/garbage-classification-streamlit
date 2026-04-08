@@ -77,6 +77,18 @@ def init_db():
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
+
+    # Rewards table
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS rewards (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_email TEXT,
+        points INTEGER,
+        status TEXT,
+        station TEXT
+    )
+    """)
+    
     conn.commit()
     conn.close()
 
