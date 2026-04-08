@@ -636,4 +636,57 @@ elif st.session_state.role == "USER" and st.session_state.user:
                 st.markdown("---")
         else:
             st.info("No reward history found yet.")
+            
+    elif st.session_state.page == "Redeem Rewards":
+        st.subheader("🎁 Redeem Rewards")
+
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+
+        # Total earned points
+        c.execute("SELECT COALESCE(SUM(points), 0) FROM rewards WHERE user_email=?", (st.session_state.user,))
+        total_earned = c.fetchone()[0]
+
+        # Total redeemed points
+        c.execute("SELECT COALESCE(SUM(points_used), 0) FROM redemptions WHERE user_email=?", (st.session_state.user,))
+        total_redeemed = c.fetchone()[0]
+
+        conn.close()
+
+        available_points = total_earned - total_redeemed
+
+        st.info(f"Available Points: {available_points}")
+
+        reward_catalog = [
+            ("AEON Voucher RM10", 100),
+            ("TNG Reload Pin RM8", 80),
+            ("Shopee Voucher RM10", 100),
+            ("GrabFood Voucher RM10", 100),
+            ("Lazada Voucher RM10", 100)
+        ]
+
+        for reward_name, points_required in reward_catalog:
+            st.write(f"### {reward_name}")
+            st.write(f"Required Points: {points_required}")
+
+            if available_points >= points_required:
+                if st.button(f"Redeem {reward_name}", key=f"redeem_{reward_name}"):
+                    conn = sqlite3.connect(DB_PATH)
+                    c = conn.cursor()
+                    c.execute(
+                        """
+                        INSERT INTO redemptions (user_email, reward_name, points_used, status)
+                        VALUES (?, ?, ?, ?)
+                        """,
+                        (st.session_state.user, reward_name, points_required, "COMPLETED")
+                    )
+                    conn.commit()
+                    conn.close()
+
+                    st.success(f"✅ You have successfully redeemed {reward_name}.")
+                    st.rerun()
+            else:
+                st.warning("Not enough points to redeem this reward.")
+
+            st.markdown("---")
  
