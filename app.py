@@ -134,7 +134,7 @@ if st.session_state.user:
         if st.session_state.role == "USER":
             page = st.radio(
                 "Go to",
-                ["Home", "Upload Waste", "Reward Status", "Pickup Scheduling", "Reward History","Redeem Rewards"," Redemption History" , "Logout"],
+                ["Home", "Upload Waste", "Reward Status", "Pickup Scheduling", "Reward History","Redeem Rewards","Redemption History" , "Logout"],
                 key="user_page_nav"
             )
             st.session_state.page = page
