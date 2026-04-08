@@ -329,6 +329,27 @@ if st.session_state.page == "Logout":
     for key in ["role", "user", "category", "reward_pending", "show_reward", "page"]:
         st.session_state[key] = None
     st.rerun()
+
+st.markdown("""
+<div style="
+    background-image: url('https://images.unsplash.com/photo-1604187351574-c75ca79f5807');
+    height: 300px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 12px;
+    position: relative;
+">
+    <div style="
+        position: absolute;
+        bottom: 20px;
+        left: 30px;
+        color: white;
+    ">
+        <h1 style="margin-bottom:5px;">♻️ Smart Recycling Reward System</h1>
+        <p style="font-size:18px;">Earn rewards while saving the environment</p>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 # =============================
 # ADMIN DASHBOARD
 # =============================
