@@ -417,7 +417,10 @@ if st.session_state.role is None:
 # ADMIN LOGIN / SIGNUP
 # =============================
 if st.session_state.role == "ADMIN" and st.session_state.user is None:
-    st.subheader("ADMIN Login / Sign Up")
+    st.markdown("<div class='auth-page-space'></div>", unsafe_allow_html=True)
+    st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='auth-title'>🛠 ADMIN Login / Sign Up</div>", unsafe_allow_html=True)
+    st.markdown("<div class='auth-subtitle'>Manage rewards, pickups, approvals, and analytics</div>", unsafe_allow_html=True)
 
     if st.button("← Back to Role Selection", key="back_from_admin"):
         st.session_state.role = None
@@ -466,7 +469,7 @@ if st.session_state.role == "ADMIN" and st.session_state.user is None:
                     conn.commit()
                     conn.close()
                     st.success("Admin Sign Up successful! Please login.")
-
+    st.markdown("</div>", unsafe_allow_html=True)
 # =============================
 # USER LOGIN / SIGNUP
 # =============================
