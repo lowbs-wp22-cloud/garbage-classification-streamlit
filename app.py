@@ -727,12 +727,47 @@ elif st.session_state.role == "USER" and st.session_state.user:
         conn.close()
 
         available_points = total_earned - total_redeemed
+        # =============================
+        # REWARD PROGRESS SYSTEM
+        # =============================
+        reward_catalog = [
+            ("TNG Reload Pin RM8", 80),
+            ("AEON Voucher RM10", 100),
+            ("Shopee Voucher RM10", 100),
+            ("GrabFood Voucher RM10", 100),
+            ("Lazada Voucher RM10", 100)
+        ]
+
+        next_reward_name = None
+        next_reward_points = None
+
+        for reward_name, points_required in reward_catalog:
+            if available_points < points_required:
+                next_reward_name = reward_name
+                next_reward_points = points_required
+                break
+
+        if next_reward_name is None:
+            next_reward_name = "All listed rewards unlocked"
+            next_reward_points = available_points if available_points > 0 else 1
+
+        points_needed = max(next_reward_points - available_points, 0)
+        progress_value = min(available_points / next_reward_points, 1.0) if next_reward_points > 0 else 0
 
         if user_info:
             name, email = user_info
 
             st.markdown(f"## 👋 Hello, {name}")
             st.write(f"**Email:** {email}")
+            st.markdown("### 🎯 Reward Progress")
+
+            if next_reward_name == "All listed rewards unlocked":
+                st.success("You have enough points to redeem all currently listed rewards.")
+                st.progress(1.0)
+            else:
+                st.info(f"Next Reward: {next_reward_name}")
+                st.write(f"You need **{points_needed} more points** to redeem this reward.")
+                st.progress(progress_value)
 
             col1, col2, col3 = st.columns(3)
 
