@@ -596,5 +596,33 @@ elif st.session_state.role == "USER" and st.session_state.user:
                     st.rerun()
         else:
             st.info("No approved pickup request available for scheduling yet.")
+            
+    elif st.session_state.page == "Reward History":
+        st.subheader("📜 Reward History")
 
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("""
+            SELECT id, points, status, station
+            FROM rewards
+            WHERE user_email=?
+            ORDER BY id DESC
+        """, (st.session_state.user,))
+        reward_history = c.fetchall()
+        conn.close()
+
+        if reward_history:
+            total_points = sum(record[1] for record in reward_history)
+            st.info(f"Total Points Collected: {total_points}")
+
+            for reward in reward_history:
+                reward_id, points, status, station = reward
+
+                st.write(f"**Reward ID:** {reward_id}")
+                st.write(f"**Points:** {points}")
+                st.write(f"**Status:** {status}")
+                st.write(f"**Source / Station:** {station if station else 'Not assigned yet'}")
+                st.markdown("---")
+        else:
+            st.info("No reward history found yet.")
  
