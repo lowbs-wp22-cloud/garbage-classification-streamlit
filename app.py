@@ -490,7 +490,7 @@ elif st.session_state.role == "USER" and st.session_state.user:
     st.title("♻️ Smart Recycling Reward System")
 
     if st.session_state.page == "Home":
-        st.title("♻️ Smart Recycling Reward System")
+        st.markdown("## ♻️ Smart Recycling Reward System")
         st.markdown("### Welcome to your recycling dashboard")
 
         conn = sqlite3.connect(DB_PATH)
