@@ -14,55 +14,52 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 # =============================
 st.markdown("""
 <style>
+
+/* NAVBAR LOGO */
 .nav-logo {
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 800;
     color: #2fa4dc;
+    letter-spacing: 1px;
 }
 
+/* NAV LINKS */
 .nav-link button {
     background: transparent !important;
     border: none !important;
-    color: #7b8794 !important;
-    font-weight: 700 !important;
+    color: #6f7782 !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    box-shadow: none !important;
+    white-space: nowrap !important;
 }
 
+/* NAV HOVER */
 .nav-link button:hover {
     color: #2fa4dc !important;
 }
 
+/* CTA BUTTON */
 .nav-cta button {
     background-color: #4aa3df !important;
     color: white !important;
     border-radius: 6px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    padding: 8px 16px !important;
 }
 
+/* CTA hover */
 .nav-cta button:hover {
     background-color: #3b94d1 !important;
+    color: white !important;
 }
-</style>
-""", unsafe_allow_html=True)
 
-st.markdown("""
-<style>
-/* top nav buttons */
+/* REMOVE BUTTON SHADOW */
 div.stButton > button {
-    background-color: transparent;
-    color: #6f7782;
-    border: none;
-    font-weight: 700;
-    font-size: 15px;
-    padding: 10px 6px;
-    box-shadow: none;
+    box-shadow: none !important;
 }
 
-div.stButton > button:hover {
-    color: #2fa4dc;
-    background-color: transparent;
-    border: none;
-}
-
-/* optional blue CTA style for last button later */
 </style>
 """, unsafe_allow_html=True)
 
