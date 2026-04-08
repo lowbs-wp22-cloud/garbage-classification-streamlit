@@ -97,10 +97,16 @@ init_db()
 def load_garbage_model():
     return tf.keras.models.load_model("FYP_general_waste.h5")
 
+import json
+
 @st.cache_resource
 def load_furniture_model():
-    return tf.keras.models.load_model("bulky_classifier.h5")
-
+    model = tf.keras.models.load_model("bulky_classifier.keras")
+    
+    with open("bulky_class_names.json", "r") as f:
+        class_names = json.load(f)
+    
+    return model, class_names
 # =============================
 # SESSION STATE DEFAULTS
 # =============================
