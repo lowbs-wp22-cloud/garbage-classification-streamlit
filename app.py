@@ -471,7 +471,10 @@ if st.session_state.role == "ADMIN" and st.session_state.user is None:
 # USER LOGIN / SIGNUP
 # =============================
 elif st.session_state.role == "USER" and st.session_state.user is None:
-    st.subheader("USER Login / Sign Up")
+    st.markdown("<div class='auth-page-space'></div>", unsafe_allow_html=True)
+    st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='auth-title'>👤 USER Login / Sign Up</div>", unsafe_allow_html=True)
+    st.markdown("<div class='auth-subtitle'>Access your recycling account and continue your sustainability journey</div>", unsafe_allow_html=True)
 
     if st.button("← Back to Role Selection", key="back_from_user"):
         st.session_state.role = None
@@ -507,6 +510,7 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
                 st.success("Sign Up successful! Please login.")
             else:
                 st.error("Email already registered")
+    st.markdown("</div>", unsafe_allow_html=True)
 # =============================
 # LOGOUT HANDLER
 # =============================
