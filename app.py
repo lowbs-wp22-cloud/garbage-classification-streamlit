@@ -95,15 +95,26 @@ init_db()
 def load_garbage_model():
     return tf.keras.models.load_model("FYP_general_waste.h5")
 
-import json
-
 @st.cache_resource
 def load_furniture_model():
-    model = tf.keras.models.load_model("bulky_classifier.keras")
-    
-    with open("bulky_class_names.json", "r") as f:
+    model_path = "bulky_classifier.keras"
+    labels_path = "bulky_class_names.json"
+
+    # download model if not exists
+    if not os.path.exists(model_path):
+        model_url = "PASTE_YOUR_NEW_KERAS_FILE_ID_HERE"
+        gdown.download(f"https://drive.google.com/uc?id={model_url}", model_path, quiet=False)
+
+    # download labels if not exists
+    if not os.path.exists(labels_path):
+        labels_url = "PASTE_YOUR_JSON_FILE_ID_HERE"
+        gdown.download(f"https://drive.google.com/uc?id={labels_url}", labels_path, quiet=False)
+
+    model = tf.keras.models.load_model(model_path)
+
+    with open(labels_path, "r") as f:
         class_names = json.load(f)
-    
+
     return model, class_names
 # =============================
 # SESSION STATE DEFAULTS
