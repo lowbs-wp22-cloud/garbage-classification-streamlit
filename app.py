@@ -336,33 +336,33 @@ if st.session_state.page == "Logout":
 elif st.session_state.role == "ADMIN" and st.session_state.user:
 
     if st.session_state.page == "Home":
-            # =============================
-            # HERO BANNER (ADD HERE)
-            # =============================
-            st.markdown("""
+        # =============================
+        # HERO BANNER
+        # =============================
+        st.markdown("""
+        <div style="
+            background-image: url('https://images.unsplash.com/photo-1604187351574-c75ca79f5807');
+            height: 300px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 12px;
+            position: relative;
+            margin-bottom: 20px;
+        ">
             <div style="
-                background-image: url('https://images.unsplash.com/photo-1604187351574-c75ca79f5807');
-                height: 300px;
-                background-size: cover;
-                background-position: center;
-                border-radius: 12px;
-                position: relative;
-                margin-bottom: 20px;
+                position: absolute;
+                bottom: 20px;
+                left: 30px;
+                color: white;
             ">
-                <div style="
-                    position: absolute;
-                    bottom: 20px;
-                    left: 30px;
-                    color: white;
-                ">
-                    <h1 style="margin-bottom:5px;">♻️ Smart Recycling Reward System</h1>
-                    <p style="font-size:18px;">Earn rewards while saving the environment</p>
-                </div>
+                <h1 style="margin-bottom:5px;">♻️ Smart Recycling Reward System</h1>
+                <p style="font-size:18px;">Earn rewards while saving the environment</p>
             </div>
-            """, unsafe_allow_html=True)
+        </div>
+        """, unsafe_allow_html=True)
 
-            # spacing
-            st.markdown("<br>", unsafe_allow_html=True)
+        # spacing
+        st.markdown("<br>", unsafe_allow_html=True)      
 
         st.title("Admin Dashboard")
         st.write("Welcome, Admin.")
