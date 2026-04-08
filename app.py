@@ -294,7 +294,10 @@ if st.session_state.role is None:
         position: absolute;
         width: 100%;
         height: 100%;
-        background-color: rgba(0,0,0,0.55);
+        background: linear-gradient(
+            rgba(0, 0, 0, 0.75),
+            rgba(0, 0, 0, 0.65)
+        );
         border-radius: 12px;
     }
 
@@ -306,27 +309,32 @@ if st.session_state.role is None:
     }
 
     .title {
-        font-size: 42px;
-        font-weight: 800;
+        font-size: 48px;
+        font-weight: 900;
         margin-bottom: 10px;
+        letter-spacing: 1px;
     }
 
     .subtitle {
-        font-size: 18px;
+        font-size: 20px;
+        opacity: 0.9;
         margin-bottom: 30px;
     }
 
     .role-btn button {
-        background-color: #4caf50 !important;
+        background: rgba(255,255,255,0.1) !important;
         color: white !important;
-        border-radius: 8px !important;
+        border-radius: 10px !important;
         font-size: 16px !important;
-        padding: 10px 20px !important;
+        padding: 12px 20px !important;
+        border: 1px solid rgba(255,255,255,0.3) !important;
+        backdrop-filter: blur(10px);
     }
 
     .role-btn button:hover {
-        background-color: #43a047 !important;
+        background: rgba(255,255,255,0.25) !important;
     }
+    
     </style>
     """, unsafe_allow_html=True)
 
