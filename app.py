@@ -689,8 +689,8 @@ elif st.session_state.role == "USER" and st.session_state.user:
                 st.warning("Not enough points to redeem this reward.")
 
             st.markdown("---")
-            
-        elif st.session_state.page == "Redemption History":
+
+    elif st.session_state.page == "Redemption History":
         st.subheader("🧾 Redemption History")
 
         conn = sqlite3.connect(DB_PATH)
@@ -718,4 +718,3 @@ elif st.session_state.role == "USER" and st.session_state.user:
                 st.markdown("---")
         else:
             st.info("No redemption history found yet.")
- 
