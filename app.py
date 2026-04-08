@@ -628,8 +628,8 @@ elif st.session_state.role == "USER" and st.session_state.user:
         # =============================
         # NAVBAR (REPLACE OLD ONE WITH THIS)
         # =============================
-        nav1, nav2, nav3, nav4, nav5, nav6 = st.columns([2.8, 1, 1, 1.4, 1.8, 1.4])
-
+        nav1, nav2, nav3, nav4, nav5, nav6 = st.columns([3.5, 1.2, 1.2, 2.2, 2.5, 1.8])
+        
         with nav1:
             st.markdown('<div class="nav-logo">♻️ SMART RECYCLING</div>', unsafe_allow_html=True)
 
