@@ -101,10 +101,6 @@ h1, h2, h3 {
     color: #2e7d32;
 }
 
-/* Buttons */
-button {
-    border-radius: 8px !important;
-}
 
 /* Info box */
 .stAlert {
