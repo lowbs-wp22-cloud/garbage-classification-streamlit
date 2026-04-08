@@ -15,37 +15,33 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 st.markdown("""
 <style>
 
-/* NAVBAR LOGO */
-.nav-logo {
-    font-size: 24px;
-    font-weight: 800;
-    color: #2fa4dc;
-    letter-spacing: 1px;
+/* REMOVE ALL DEFAULT BUTTON STYLE */
+div.stButton > button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #6f7782 !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    padding: 8px 10px !important;
 }
 
 /* NAV LINKS */
 .nav-link button {
     background: transparent !important;
     border: none !important;
-    color: #6f7782 !important;
-    font-weight: 600 !important;
-    font-size: 15px !important;
-    box-shadow: none !important;
-    white-space: nowrap !important;
 }
 
-/* NAV HOVER */
+/* HOVER */
 .nav-link button:hover {
     color: #2fa4dc !important;
 }
 
-/* CTA BUTTON */
+/* CTA BUTTON ONLY */
 .nav-cta button {
     background-color: #4aa3df !important;
     color: white !important;
     border-radius: 6px !important;
-    font-weight: 700 !important;
-    font-size: 14px !important;
     padding: 8px 16px !important;
 }
 
@@ -53,11 +49,6 @@ st.markdown("""
 .nav-cta button:hover {
     background-color: #3b94d1 !important;
     color: white !important;
-}
-
-/* REMOVE BUTTON SHADOW */
-div.stButton > button {
-    box-shadow: none !important;
 }
 
 </style>
