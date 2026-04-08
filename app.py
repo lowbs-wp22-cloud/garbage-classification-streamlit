@@ -1,3 +1,44 @@
+# =============================
+# CUSTOM CSS (UI DESIGN)
+# =============================
+st.markdown("""
+<style>
+/* Main background */
+[data-testid="stAppViewContainer"] {
+    background-color: #f5f7fa;
+}
+
+/* Sidebar */
+[data-testid="stSidebar"] {
+    background-color: #e8f5e9;
+}
+
+/* Metric cards */
+div[data-testid="metric-container"] {
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Titles */
+h1, h2, h3 {
+    color: #2e7d32;
+}
+
+/* Buttons */
+button {
+    border-radius: 8px !important;
+}
+
+/* Info box */
+.stAlert {
+    border-radius: 10px;
+}
+</style>
+""", unsafe_allow_html=True)
+
 import streamlit as st
 import sqlite3
 import tensorflow as tf
