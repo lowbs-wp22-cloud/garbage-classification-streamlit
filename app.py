@@ -278,13 +278,14 @@ if st.session_state.role is None:
 
     st.markdown("""
     <style>
-    .landing-container {
-        height: 90vh;
-        background-image: url("https://images.unsplash.com/photo-1509395176047-4a66953fd231");
+
+    .landing {
+        position: relative;
+        height: 100vh;
+        width: 100%;
+        background-image: url("https://images.unsplash.com/photo-1621451537084-482c73073a0f");
         background-size: cover;
         background-position: center;
-        border-radius: 12px;
-        position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -294,17 +295,13 @@ if st.session_state.role is None:
         position: absolute;
         width: 100%;
         height: 100%;
-        background: linear-gradient(
-            rgba(0, 0, 0, 0.75),
-            rgba(0, 0, 0, 0.65)
-        );
-        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.6);
     }
 
-    .content {
+    .center-content {
         position: relative;
-        color: white;
         text-align: center;
+        color: white;
         z-index: 2;
     }
 
@@ -312,49 +309,45 @@ if st.session_state.role is None:
         font-size: 48px;
         font-weight: 900;
         margin-bottom: 10px;
-        letter-spacing: 1px;
     }
 
     .subtitle {
         font-size: 20px;
-        opacity: 0.9;
         margin-bottom: 30px;
     }
 
-    .role-btn button {
-        background: rgba(255,255,255,0.1) !important;
+    .btn button {
+        background-color: rgba(76, 175, 80, 0.9) !important;
         color: white !important;
-        border-radius: 10px !important;
+        border-radius: 8px !important;
         font-size: 16px !important;
-        padding: 12px 20px !important;
-        border: 1px solid rgba(255,255,255,0.3) !important;
-        backdrop-filter: blur(10px);
+        padding: 12px !important;
     }
 
-    .role-btn button:hover {
-        background: rgba(255,255,255,0.25) !important;
+    .btn button:hover {
+        background-color: #43a047 !important;
     }
-    
+
     </style>
     """, unsafe_allow_html=True)
 
-    # Container
-    st.markdown('<div class="landing-container"><div class="overlay"></div><div class="content">', unsafe_allow_html=True)
+    # MAIN CONTAINER
+    st.markdown('<div class="landing"><div class="overlay"></div><div class="center-content">', unsafe_allow_html=True)
 
-    st.markdown('<div class="title">Smart Recycling System</div>', unsafe_allow_html=True)
+    st.markdown('<div class="title">♻️ Smart Recycling System</div>', unsafe_allow_html=True)
     st.markdown('<div class="subtitle">Promoting sustainability and rewarding eco-friendly actions</div>', unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown('<div class="role-btn">', unsafe_allow_html=True)
+        st.markdown('<div class="btn">', unsafe_allow_html=True)
         if st.button("👤 USER", use_container_width=True):
             st.session_state.role = "USER"
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
     with col2:
-        st.markdown('<div class="role-btn">', unsafe_allow_html=True)
+        st.markdown('<div class="btn">', unsafe_allow_html=True)
         if st.button("🛠 ADMIN", use_container_width=True):
             st.session_state.role = "ADMIN"
             st.rerun()
