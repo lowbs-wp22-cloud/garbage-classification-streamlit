@@ -626,22 +626,36 @@ elif st.session_state.role == "USER" and st.session_state.user:
             st.markdown('<div class="nav-logo">♻️ SMART RECYCLING</div>', unsafe_allow_html=True)
 
         with nav2:
-            st.markdown('<div class="nav-active">HOME</div>', unsafe_allow_html=True)
+            if st.session_state.page == "Home":
+                st.markdown('<div class="nav-active">HOME</div>', unsafe_allow_html=True)
+            else:
+                if st.button("HOME", key="nav_home", type="tertiary", use_container_width=True):
+                    st.session_state.page = "Home"
+                    st.rerun()
 
         with nav3:
-            if st.button("ABOUT", key="nav_about", type="tertiary", use_container_width=True):
-                st.session_state.page = "Profile"
-                st.rerun()
+            if st.session_state.page == "Profile":
+                st.markdown('<div class="nav-active">ABOUT</div>', unsafe_allow_html=True)
+            else:
+                if st.button("ABOUT", key="nav_about", type="tertiary", use_container_width=True):
+                    st.session_state.page = "Profile"
+                    st.rerun()
 
         with nav4:
-            if st.button("HOW IT WORKS", key="nav_how", type="tertiary", use_container_width=True):
-                st.session_state.page = "Upload Waste"
-                st.rerun()
+            if st.session_state.page == "Upload Waste":
+                st.markdown('<div class="nav-active">HOW IT WORKS</div>', unsafe_allow_html=True)
+            else:
+                if st.button("HOW IT WORKS", key="nav_how", type="tertiary", use_container_width=True):
+                    st.session_state.page = "Upload Waste"
+                    st.rerun()
 
         with nav5:
-            if st.button("PARTNER BENEFITS", key="nav_partner", type="tertiary", use_container_width=True):
-                st.session_state.page = "Reward Status"
-                st.rerun()
+            if st.session_state.page == "Reward Status":
+                st.markdown('<div class="nav-active">PARTNER BENEFITS</div>', unsafe_allow_html=True)
+            else:
+                if st.button("PARTNER BENEFITS", key="nav_partner", type="tertiary", use_container_width=True):
+                    st.session_state.page = "Reward Status"
+                    st.rerun()
 
         with nav6:
             if st.button("INSTANT QUOTE", key="nav_quote", type="primary", use_container_width=True):
