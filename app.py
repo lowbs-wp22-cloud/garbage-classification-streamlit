@@ -8,9 +8,6 @@ import os
 import gdown
 from tensorflow.keras.models import load_model
 
-
-
-bulky_model = load_bulky_model()
 # =============================
 # PAGE CONFIG
 # =============================
