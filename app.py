@@ -280,7 +280,7 @@ if st.session_state.role is None:
     <style>
     .landing-container {
         height: 90vh;
-        background-image: url("https://images.unsplash.com/photo-1604187351574-c75ca79f5807");
+        background-image: url("https://images.unsplash.com/photo-1509395176047-4a66953fd231");
         background-size: cover;
         background-position: center;
         border-radius: 12px;
