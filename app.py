@@ -292,8 +292,6 @@ if st.session_state.role is None:
 # =============================
 if st.session_state.role == "ADMIN" and st.session_state.user is None:
     st.subheader("ADMIN Login / Sign Up")
-    if st.session_state.role == "ADMIN" and st.session_state.user is None:
-    st.subheader("ADMIN Login / Sign Up")
 
     if st.button("← Back to Role Selection", key="back_from_admin"):
         st.session_state.role = None
@@ -347,8 +345,6 @@ if st.session_state.role == "ADMIN" and st.session_state.user is None:
 # USER LOGIN / SIGNUP
 # =============================
 elif st.session_state.role == "USER" and st.session_state.user is None:
-    st.subheader("USER Login / Sign Up")
-    elif st.session_state.role == "USER" and st.session_state.user is None:
     st.subheader("USER Login / Sign Up")
 
     if st.button("← Back to Role Selection", key="back_from_user"):
