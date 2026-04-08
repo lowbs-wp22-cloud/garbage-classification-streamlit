@@ -14,6 +14,50 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 # =============================
 st.markdown("""
 <style>
+/* ===== NAVBAR ROW TUNING ===== */
+.nav-logo {
+    font-size: 22px;
+    font-weight: 800;
+    color: #2fa4dc;
+    letter-spacing: 1px;
+}
+
+.nav-link button {
+    background: transparent !important;
+    border: none !important;
+    color: #7b8794 !important;
+    font-weight: 700 !important;
+    font-size: 15px !important;
+    box-shadow: none !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+}
+
+.nav-link button:hover {
+    color: #2fa4dc !important;
+    background: transparent !important;
+}
+
+.nav-cta button {
+    background-color: #4aa3df !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 6px !important;
+    font-weight: 700 !important;
+    font-size: 15px !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+}
+
+.nav-cta button:hover {
+    background-color: #3b94d1 !important;
+    color: white !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<style>
 /* top nav buttons */
 div.stButton > button {
     background-color: transparent;
