@@ -1,3 +1,14 @@
+import streamlit as st
+import sqlite3
+import tensorflow as tf
+import numpy as np
+from PIL import Image
+from werkzeug.security import generate_password_hash, check_password_hash
+import os
+import gdown
+import json
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
+
 # =============================
 # CUSTOM CSS (UI DESIGN)
 # =============================
@@ -38,17 +49,6 @@ button {
 }
 </style>
 """, unsafe_allow_html=True)
-
-import streamlit as st
-import sqlite3
-import tensorflow as tf
-import numpy as np
-from PIL import Image
-from werkzeug.security import generate_password_hash, check_password_hash
-import os
-import gdown
-import json
-from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 
 # =============================
 # PAGE CONFIG
