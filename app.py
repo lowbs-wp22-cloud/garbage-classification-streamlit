@@ -66,6 +66,17 @@ def init_db():
     )
     """)
     
+    # Redemptions table
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS redemptions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_email TEXT,
+        reward_name TEXT,
+        points_used INTEGER,
+        status TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
     conn.commit()
     conn.close()
 
