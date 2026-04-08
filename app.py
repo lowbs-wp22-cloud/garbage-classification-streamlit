@@ -111,6 +111,55 @@ h1, h2, h3 {
 </style>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+.auth-page-space {
+    height: 12vh;
+}
+
+.auth-card {
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 20px;
+    padding: 35px 30px;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.auth-title {
+    text-align: center;
+    color: white;
+    font-size: 42px;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.auth-subtitle {
+    text-align: center;
+    color: rgba(255,255,255,0.92);
+    font-size: 18px;
+    margin-bottom: 25px;
+}
+
+.auth-label {
+    color: white;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+/* make text inputs cleaner on auth pages */
+div[data-testid="stTextInput"] input {
+    border-radius: 12px !important;
+}
+
+/* make auth radio text easier to see */
+div[role="radiogroup"] label {
+    color: white !important;
+    font-weight: 500 !important;
+}
+</style>
+""", unsafe_allow_html=True)
 # =============================
 # PAGE CONFIG
 # =============================
