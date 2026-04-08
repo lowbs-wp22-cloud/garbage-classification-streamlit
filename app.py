@@ -15,21 +15,23 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 st.markdown("""
 <style>
 
-/* REMOVE ALL DEFAULT BUTTON STYLE */
-div.stButton > button {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    color: #6f7782 !important;
-    font-weight: 600 !important;
-    font-size: 15px !important;
-    padding: 8px 10px !important;
+/* LOGO */
+.nav-logo {
+    font-size: 24px;
+    font-weight: 800;
+    color: #2fa4dc;
+    letter-spacing: 1px;
 }
 
 /* NAV LINKS */
 .nav-link button {
     background: transparent !important;
     border: none !important;
+    color: #6f7782 !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    box-shadow: none !important;
+    white-space: nowrap !important;
 }
 
 /* HOVER */
@@ -37,11 +39,13 @@ div.stButton > button {
     color: #2fa4dc !important;
 }
 
-/* CTA BUTTON ONLY */
+/* CTA BUTTON */
 .nav-cta button {
     background-color: #4aa3df !important;
     color: white !important;
     border-radius: 6px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
     padding: 8px 16px !important;
 }
 
@@ -51,9 +55,13 @@ div.stButton > button {
     color: white !important;
 }
 
+/* REMOVE DEFAULT BUTTON SHADOW */
+div.stButton > button {
+    box-shadow: none !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
-
 st.markdown("""
 <div style='
     background-color:#7cb342;
