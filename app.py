@@ -275,11 +275,85 @@ if st.session_state.user:
 # ROLE SELECTION (FIXED)
 # =============================
 if st.session_state.role is None:
-    st.subheader("Select Role")
 
-    role_choice = st.radio(
-        "Choose your role",
-        ["USER", "ADMIN"],
+    st.markdown("""
+    <style>
+    .landing-container {
+        height: 90vh;
+        background-image: url("https://images.unsplash.com/photo-1618477461853-cf6ed80faba5");
+        background-size: cover;
+        background-position: center;
+        border-radius: 12px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .overlay {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.55);
+        border-radius: 12px;
+    }
+
+    .content {
+        position: relative;
+        color: white;
+        text-align: center;
+        z-index: 2;
+    }
+
+    .title {
+        font-size: 42px;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .subtitle {
+        font-size: 18px;
+        margin-bottom: 30px;
+    }
+
+    .role-btn button {
+        background-color: #4caf50 !important;
+        color: white !important;
+        border-radius: 8px !important;
+        font-size: 16px !important;
+        padding: 10px 20px !important;
+    }
+
+    .role-btn button:hover {
+        background-color: #43a047 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # Container
+    st.markdown('<div class="landing-container"><div class="overlay"></div><div class="content">', unsafe_allow_html=True)
+
+    st.markdown('<div class="title">Smart Recycling System</div>', unsafe_allow_html=True)
+    st.markdown('<div class="subtitle">Promoting sustainability and rewarding eco-friendly actions</div>', unsafe_allow_html=True)
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown('<div class="role-btn">', unsafe_allow_html=True)
+        if st.button("👤 USER", use_container_width=True):
+            st.session_state.role = "USER"
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with col2:
+        st.markdown('<div class="role-btn">', unsafe_allow_html=True)
+        if st.button("🛠 ADMIN", use_container_width=True):
+            st.session_state.role = "ADMIN"
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown('</div></div>', unsafe_allow_html=True)
+    
         index=None   # 👈 IMPORTANT: no default selection
     )
 
