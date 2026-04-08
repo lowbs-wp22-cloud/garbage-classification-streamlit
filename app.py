@@ -529,7 +529,13 @@ elif st.session_state.role == "USER" and st.session_state.user:
                 model, labels = load_furniture_model()
 
             img = image.resize((224, 224))
-            arr = np.expand_dims(np.array(img) / 255.0, axis=0)
+            img_array = np.array(img)
+
+            if st.session_state.category == "General Waste":
+                arr = np.expand_dims(img_array / 255.0, axis=0)
+            else:
+                arr = np.expand_dims(img_array, axis=0)
+                arr = preprocess_input(arr.astype(np.float32))
 
             try:
                 pred = model.predict(arr, verbose=0)
