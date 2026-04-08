@@ -656,6 +656,30 @@ elif st.session_state.role == "USER" and st.session_state.user:
                 st.metric("Completed Pickups", completed_pickups)
                 st.metric("Total Redemptions", total_redemptions)
 
+            st.markdown("### Quick Actions")
+
+            col1, col2, col3, col4 = st.columns(4)
+
+            with col1:
+                if st.button("📤 Upload Waste", use_container_width=True):
+                    st.session_state.page = "Upload Waste"
+                    st.rerun()
+
+            with col2:
+                if st.button("🎁 Reward Status", use_container_width=True):
+                    st.session_state.page = "Reward Status"
+                    st.rerun()
+
+            with col3:
+                if st.button("🚚 Pickup Scheduling", use_container_width=True):
+                    st.session_state.page = "Pickup Scheduling"
+                    st.rerun()
+
+            with col4:
+                if st.button("🛒 Redeem Rewards", use_container_width=True):
+                    st.session_state.page = "Redeem Rewards"
+                    st.rerun()
+
             st.markdown("---")
             st.markdown("### Quick Guide")
             st.info("Use the sidebar to upload waste, check reward status, schedule pickup, redeem rewards, and view your profile.")
