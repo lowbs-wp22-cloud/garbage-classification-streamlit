@@ -598,8 +598,7 @@ elif st.session_state.role == "USER" and st.session_state.user:
 
         # spacing
         st.markdown("<br>", unsafe_allow_html=True)      
-
-        st.markdown("## ♻️ Smart Recycling Reward System")
+        
         st.markdown("### Welcome to your recycling dashboard")
 
         conn = sqlite3.connect(DB_PATH)
