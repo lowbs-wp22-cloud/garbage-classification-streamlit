@@ -211,41 +211,7 @@ st.markdown("""
 st.markdown("""
 <style>
 
-/* Choose an option / Email / Password labels */
-div[data-testid="stWidgetLabel"] {
-    color: white !important;
-    font-weight: 600 !important;
-}
 
-/* Login / Sign Up radio text */
-div[role="radiogroup"] label p {
-    color: white !important;
-    font-weight: 600 !important;
-}
-
-/* Normal text inside auth page if needed */
-label p {
-    color: white !important;
-}
-
-/* Input box text */
-div[data-testid="stTextInput"] input {
-    color: black !important;
-    background-color: white !important;
-}
-
-/* Placeholder text */
-div[data-testid="stTextInput"] input::placeholder {
-    color: rgba(0,0,0,0.5) !important;
-}
-
-/* Password eye icon */
-svg {
-    color: black !important;
-}
-
-</style>
-""", unsafe_allow_html=True)
 # =============================
 # PAGE CONFIG
 # =============================
@@ -591,18 +557,13 @@ if st.session_state.role == "ADMIN" and st.session_state.user is None:
 elif st.session_state.role == "USER" and st.session_state.user is None:
 
     # full-page auth background
-    st.markdown("""
-    <style>
-    [data-testid="stAppViewContainer"] {
-        background-image: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)),
-                          url("https://images.unsplash.com/photo-1621451537084-482c73073a0f");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
+   st.markdown("""
+   <style>
+    div[data-testid="stWidgetLabel"] {
+        color: white !important;
     }
-    [data-testid="stHeader"] {
-        background: rgba(0,0,0,0);
+    div[role="radiogroup"] label p {
+        color: white !important;
     }
     </style>
     """, unsafe_allow_html=True)
