@@ -604,25 +604,31 @@ elif st.session_state.role == "USER" and st.session_state.user:
         else:
             st.info("No reward record found yet.")
 
-        station = st.selectbox(
-            "Choose nearby recycling station",
-            ["EcoPoint Center", "GreenCycle Hub", "City Recycling Station"]
-        )
+        st.markdown("### Suggested Recycling Stations")
 
-        if reward and st.button("Confirm Delivery") and status == "APPROVED":
-            conn = sqlite3.connect(DB_PATH)
-            c = conn.cursor()
-            c.execute(
-                "UPDATE rewards SET station=? WHERE user_email=? AND status='APPROVED'",
-                (station, st.session_state.user)
-            )
-            conn.commit()
-            conn.close()
-            st.success("✅ Delivery confirmed!")
-            st.session_state.reward_pending = None
-            st.session_state.category = None
-            st.session_state.show_reward = None
-            st.rerun()
+        stations = [
+            {
+                "name": "1Recycling Centre (1RC) @ 1 Utama",
+                "address": "City Centre, B2 Highstreet, 1, Lebuh Bandar Utama, Petaling Jaya",
+                "hours": "Open · Closes 10 PM"
+            },
+            {
+                "name": "IPC Recycling & Buy-Back Centre",
+                "address": "IPC Shopping Centre, Ladies Parking, Level P1, Petaling Jaya",
+                "hours": "Open · Closes 10 PM"
+            },
+            {
+                "name": "PJ Eco Recycling Plaza",
+                "address": "Jalan SS8/39, Petaling Jaya",
+                "hours": "Open · Closes 4:30 PM"
+            }
+        ]
+
+        for s in stations:
+            st.markdown(f"**{s['name']}**")
+            st.write(s["address"])
+            st.write(s["hours"])
+            st.markdown("---")
             
     elif st.session_state.page == "Pickup Scheduling":
         st.subheader("🚚 Pickup Scheduling")
