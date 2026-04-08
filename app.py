@@ -169,6 +169,44 @@ div[role="radiogroup"] label {
 }
 </style>
 """, unsafe_allow_html=True)
+
+st.markdown("""
+<style>
+.auth-title-center {
+    text-align: center;
+    color: white;
+    font-size: 46px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.auth-subtitle-center {
+    text-align: center;
+    color: rgba(255,255,255,0.92);
+    font-size: 18px;
+    margin-bottom: 28px;
+}
+
+.auth-note-center {
+    text-align: center;
+    color: rgba(255,255,255,0.88);
+    font-size: 15px;
+    margin-bottom: 18px;
+}
+
+.auth-box {
+    background: rgba(255,255,255,0.10);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.20);
+    border-radius: 18px;
+    padding: 30px 26px;
+}
+
+.auth-back-space {
+    margin-bottom: 14px;
+}
+</style>
+""", unsafe_allow_html=True)
 # =============================
 # PAGE CONFIG
 # =============================
@@ -426,109 +464,157 @@ if st.session_state.role is None:
 # ADMIN LOGIN / SIGNUP
 # =============================
 if st.session_state.role == "ADMIN" and st.session_state.user is None:
-    st.markdown("<div class='auth-page-space'></div>", unsafe_allow_html=True)
-    st.markdown("<div class='auth-bg'>", unsafe_allow_html=True)
-    st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
-    st.markdown("<div class='auth-title'>🛠 ADMIN Login / Sign Up</div>", unsafe_allow_html=True)
-    st.markdown("<div class='auth-subtitle'>Manage rewards, pickups, approvals, and analytics</div>", unsafe_allow_html=True)
-    st.markdown("<div class='auth-note'>Choose an option to continue</div>", unsafe_allow_html=True)
 
-    if st.button("← Back to Role Selection", key="back_from_admin"):
-        st.session_state.role = None
-        st.rerun()
+    # full-page auth background
+    st.markdown("""
+    <style>
+    [data-testid="stAppViewContainer"] {
+        background-image: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)),
+                          url("https://images.unsplash.com/photo-1621451537084-482c73073a0f");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+    [data-testid="stHeader"] {
+        background: rgba(0,0,0,0);
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-    option = st.radio("Choose an option", ["Login", "Sign Up"], key="admin_option")
-    
-    if option == "Login":
-        staff_id = st.text_input("Staff ID", key="admin_login_id")
-        password = st.text_input("Password", type="password", key="admin_login_pw")
-        
-        if st.button("Login"):
-            conn = sqlite3.connect(DB_PATH)
-            c = conn.cursor()
-            c.execute("SELECT password FROM staff WHERE staff_id=?", (staff_id,))
-            row = c.fetchone()
-            conn.close()
-            if row and check_password_hash(row[0], password):
-                st.session_state.user = staff_id
-                st.session_state.page = "Home"
-                st.success("ADMIN login successful!")
-                st.rerun()
-            else:
-                st.error("Invalid StaffID or Password")
-                
-    elif option == "Sign Up":
-        staff_id = st.text_input("Staff ID", key="admin_signup_id")
-        name = st.text_input("Name", key="admin_signup_name")
-        email = st.text_input("Email", key="admin_signup_email")
-        password = st.text_input("Password", type="password", key="admin_signup_pw")
-        confirm = st.text_input("Confirm Password", type="password", key="admin_signup_confirm")
-        
-        if st.button("Sign Up"):
-            if password != confirm:
-                st.error("Passwords do not match")
-            else:
+    st.markdown("<div style='height:12vh;'></div>", unsafe_allow_html=True)
+
+    left, center, right = st.columns([1.2, 2.2, 1.2])
+
+    with center:
+        st.markdown('<div class="auth-title-center">🛠 ADMIN Login / Sign Up</div>', unsafe_allow_html=True)
+        st.markdown('<div class="auth-subtitle-center">Manage rewards, pickups, approvals, and analytics</div>', unsafe_allow_html=True)
+        st.markdown('<div class="auth-note-center">Choose an option to continue</div>', unsafe_allow_html=True)
+
+        st.markdown('<div class="auth-box">', unsafe_allow_html=True)
+
+        if st.button("← Back to Role Selection", key="back_from_admin"):
+            st.session_state.role = None
+            st.rerun()
+
+        option = st.radio("Choose an option", ["Login", "Sign Up"], key="admin_option")
+
+        if option == "Login":
+            staff_id = st.text_input("Staff ID", key="admin_login_id")
+            password = st.text_input("Password", type="password", key="admin_login_pw")
+
+            if st.button("Login", key="admin_login_btn"):
                 conn = sqlite3.connect(DB_PATH)
                 c = conn.cursor()
-                c.execute("SELECT * FROM staff WHERE staff_id=?", (staff_id,))
-                if c.fetchone():
-                    st.error("StaffID already exists")
+                c.execute("SELECT password FROM staff WHERE staff_id=?", (staff_id,))
+                row = c.fetchone()
+                conn.close()
+
+                if row and check_password_hash(row[0], password):
+                    st.session_state.user = staff_id
+                    st.session_state.page = "Home"
+                    st.success("ADMIN login successful!")
+                    st.rerun()
                 else:
-                    hashed = generate_password_hash(password)
-                    c.execute("INSERT INTO staff (staff_id, name, email, password) VALUES (?,?,?,?)",
-                              (staff_id, name, email, hashed))
-                    conn.commit()
-                    conn.close()
-                    st.success("Admin Sign Up successful! Please login.")
-    st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+                    st.error("Invalid StaffID or Password")
+
+        elif option == "Sign Up":
+            staff_id = st.text_input("Staff ID", key="admin_signup_id")
+            name = st.text_input("Name", key="admin_signup_name")
+            email = st.text_input("Email", key="admin_signup_email")
+            password = st.text_input("Password", type="password", key="admin_signup_pw")
+            confirm = st.text_input("Confirm Password", type="password", key="admin_signup_confirm")
+
+            if st.button("Sign Up", key="admin_signup_btn"):
+                if password != confirm:
+                    st.error("Passwords do not match")
+                else:
+                    conn = sqlite3.connect(DB_PATH)
+                    c = conn.cursor()
+                    c.execute("SELECT * FROM staff WHERE staff_id=?", (staff_id,))
+                    if c.fetchone():
+                        st.error("StaffID already exists")
+                    else:
+                        hashed = generate_password_hash(password)
+                        c.execute(
+                            "INSERT INTO staff (staff_id, name, email, password) VALUES (?,?,?,?)",
+                            (staff_id, name, email, hashed)
+                        )
+                        conn.commit()
+                        conn.close()
+                        st.success("Admin Sign Up successful! Please login.")
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
 # =============================
 # USER LOGIN / SIGNUP
 # =============================
 elif st.session_state.role == "USER" and st.session_state.user is None:
-    st.markdown("<div class='auth-page-space'></div>", unsafe_allow_html=True)
-    st.markdown("<div class='auth-bg'>", unsafe_allow_html=True)
-    st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
-    st.markdown("<div class='auth-title'>👤 USER Login / Sign Up</div>", unsafe_allow_html=True)
-    st.markdown("<div class='auth-subtitle'>Access your recycling account and continue your sustainability journey</div>", unsafe_allow_html=True)
-    st.markdown("<div class='auth-note'>Choose an option to continue</div>", unsafe_allow_html=True)
 
-    if st.button("← Back to Role Selection", key="back_from_user"):
-        st.session_state.role = None
-        st.rerun()
+    # full-page auth background
+    st.markdown("""
+    <style>
+    [data-testid="stAppViewContainer"] {
+        background-image: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)),
+                          url("https://images.unsplash.com/photo-1621451537084-482c73073a0f");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+    [data-testid="stHeader"] {
+        background: rgba(0,0,0,0);
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-    option = st.radio("Choose an option", ["Login", "Sign Up"], key="user_option")
-    
-    if option == "Login":
-        email = st.text_input("Email", key="user_login_email")
-        password = st.text_input("Password", type="password", key="user_login_pw")
-        
-        if st.button("Login"):
-            if login_user(email, password):
-                st.session_state.user = email
-                st.session_state.page = "Home"
-                st.success("USER login successful!")
-                st.rerun()
-            else:
-                st.error("Invalid Email or Password")
-                
-    elif option == "Sign Up":
-        name = st.text_input("Name", key="user_signup_name")
-        email = st.text_input("Email", key="user_signup_email")
-        password = st.text_input("Password", type="password", key="user_signup_pw")
-        confirm = st.text_input("Confirm Password", type="password", key="user_signup_confirm")
-        
-        if st.button("Sign Up"):
-            if password != confirm:
-                st.error("Passwords do not match")
-            elif not name or not email or not password:
-                st.error("All fields are required")
-            elif signup_user(name, email, password):
-                st.success("Sign Up successful! Please login.")
-            else:
-                st.error("Email already registered")
-    st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:12vh;'></div>", unsafe_allow_html=True)
+
+    left, center, right = st.columns([1.2, 2.2, 1.2])
+
+    with center:
+        st.markdown('<div class="auth-title-center">👤 USER Login / Sign Up</div>', unsafe_allow_html=True)
+        st.markdown('<div class="auth-subtitle-center">Access your recycling account and continue your sustainability journey</div>', unsafe_allow_html=True)
+        st.markdown('<div class="auth-note-center">Choose an option to continue</div>', unsafe_allow_html=True)
+
+        st.markdown('<div class="auth-box">', unsafe_allow_html=True)
+
+        if st.button("← Back to Role Selection", key="back_from_user"):
+            st.session_state.role = None
+            st.rerun()
+
+        option = st.radio("Choose an option", ["Login", "Sign Up"], key="user_option")
+
+        if option == "Login":
+            email = st.text_input("Email", key="user_login_email")
+            password = st.text_input("Password", type="password", key="user_login_pw")
+
+            if st.button("Login", key="user_login_btn"):
+                if login_user(email, password):
+                    st.session_state.user = email
+                    st.session_state.page = "Home"
+                    st.success("USER login successful!")
+                    st.rerun()
+                else:
+                    st.error("Invalid Email or Password")
+
+        elif option == "Sign Up":
+            name = st.text_input("Name", key="user_signup_name")
+            email = st.text_input("Email", key="user_signup_email")
+            password = st.text_input("Password", type="password", key="user_signup_pw")
+            confirm = st.text_input("Confirm Password", type="password", key="user_signup_confirm")
+
+            if st.button("Sign Up", key="user_signup_btn"):
+                if password != confirm:
+                    st.error("Passwords do not match")
+                elif not name or not email or not password:
+                    st.error("All fields are required")
+                elif signup_user(name, email, password):
+                    st.success("Sign Up successful! Please login.")
+                else:
+                    st.error("Email already registered")
+
+        st.markdown("</div>", unsafe_allow_html=True)
 # =============================
 # LOGOUT HANDLER
 # =============================
