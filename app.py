@@ -208,7 +208,44 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
 
+/* Choose an option / Email / Password labels */
+div[data-testid="stWidgetLabel"] {
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+/* Login / Sign Up radio text */
+div[role="radiogroup"] label p {
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+/* Normal text inside auth page if needed */
+label p {
+    color: white !important;
+}
+
+/* Input box text */
+div[data-testid="stTextInput"] input {
+    color: black !important;
+    background-color: white !important;
+}
+
+/* Placeholder text */
+div[data-testid="stTextInput"] input::placeholder {
+    color: rgba(0,0,0,0.5) !important;
+}
+
+/* Password eye icon */
+svg {
+    color: black !important;
+}
+
+</style>
+""", unsafe_allow_html=True)
 # =============================
 # PAGE CONFIG
 # =============================
