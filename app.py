@@ -331,7 +331,60 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
 
                 st.markdown("---")
         else:
-            st.info("No pending pickup requests.")     
+            st.info("No pending pickup requests.")
+            
+    elif st.session_state.page == "Scheduled Pickups":
+        st.title("Admin Dashboard - Scheduled Pickups")
+
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("""
+            SELECT id, user_email, predicted_label, address, pickup_date, pickup_time_slot, note, status
+            FROM pickup_requests
+            WHERE status = 'SCHEDULED'
+            ORDER BY pickup_date ASC
+        """)
+        scheduled_pickups = c.fetchall()
+        conn.close()
+
+        if scheduled_pickups:
+            for pickup in scheduled_pickups:
+                request_id, user_email, predicted_label, address, pickup_date, pickup_time_slot, note, status = pickup
+
+                st.write(f"**Request ID:** {request_id}")
+                st.write(f"**User:** {user_email}")
+                st.write(f"**Item:** {predicted_label}")
+                st.write(f"**Address:** {address}")
+                st.write(f"**Pickup Date:** {pickup_date}")
+                st.write(f"**Time Slot:** {pickup_time_slot}")
+                st.write(f"**Note:** {note if note else 'No additional note'}")
+                st.write(f"**Status:** {status}")
+
+                if st.button(f"MARK COMPLETED {request_id}", key=f"complete_pickup_{request_id}"):
+                    conn = sqlite3.connect(DB_PATH)
+                    c = conn.cursor()
+
+                    # Mark pickup request as completed
+                    c.execute(
+                        "UPDATE pickup_requests SET status='COMPLETED' WHERE id=?",
+                        (request_id,)
+                    )
+
+                    # Add 30 points to rewards table after completion
+                    c.execute(
+                        "INSERT INTO rewards (user_email, points, status, station) VALUES (?, ?, ?, ?)",
+                        (user_email, 30, "APPROVED", "Door-to-door pickup completed")
+                    )
+
+                    conn.commit()
+                    conn.close()
+
+                    st.success(f"Pickup request {request_id} marked as completed. 30 points added to user.")
+                    st.rerun()
+
+                st.markdown("---")
+        else:
+            st.info("No scheduled pickups.")
 # =============================
 # USER FLOW
 # =============================
@@ -544,55 +597,4 @@ elif st.session_state.role == "USER" and st.session_state.user:
         else:
             st.info("No approved pickup request available for scheduling yet.")
 
-    elif st.session_state.page == "Scheduled Pickups":
-        st.title("Admin Dashboard - Scheduled Pickups")
-
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute("""
-            SELECT id, user_email, predicted_label, address, pickup_date, pickup_time_slot, note, status
-            FROM pickup_requests
-            WHERE status = 'SCHEDULED'
-            ORDER BY pickup_date ASC
-        """)
-        scheduled_pickups = c.fetchall()
-        conn.close()
-
-        if scheduled_pickups:
-            for pickup in scheduled_pickups:
-                request_id, user_email, predicted_label, address, pickup_date, pickup_time_slot, note, status = pickup
-
-                st.write(f"**Request ID:** {request_id}")
-                st.write(f"**User:** {user_email}")
-                st.write(f"**Item:** {predicted_label}")
-                st.write(f"**Address:** {address}")
-                st.write(f"**Pickup Date:** {pickup_date}")
-                st.write(f"**Time Slot:** {pickup_time_slot}")
-                st.write(f"**Note:** {note if note else 'No additional note'}")
-                st.write(f"**Status:** {status}")
-
-                if st.button(f"MARK COMPLETED {request_id}", key=f"complete_pickup_{request_id}"):
-                    conn = sqlite3.connect(DB_PATH)
-                    c = conn.cursor()
-
-                    # Mark pickup request as completed
-                    c.execute(
-                        "UPDATE pickup_requests SET status='COMPLETED' WHERE id=?",
-                        (request_id,)
-                    )
-
-                    # Add 30 points to rewards table after completion
-                    c.execute(
-                        "INSERT INTO rewards (user_email, points, status, station) VALUES (?, ?, ?, ?)",
-                        (user_email, 30, "APPROVED", "Door-to-door pickup completed")
-                    )
-
-                    conn.commit()
-                    conn.close()
-
-                    st.success(f"Pickup request {request_id} marked as completed. 30 points added to user.")
-                    st.rerun()
-
-                st.markdown("---")
-        else:
-            st.info("No scheduled pickups.")
+ 
