@@ -396,6 +396,70 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
                 st.markdown("---")
         else:
             st.info("No scheduled pickups.")
+            
+    elif st.session_state.page == "Analytics":
+        st.title("Admin Dashboard - Analytics")
+
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+
+        # Total users
+        c.execute("SELECT COUNT(*) FROM users")
+        total_users = c.fetchone()[0]
+
+        # Total rewards records
+        c.execute("SELECT COUNT(*) FROM rewards")
+        total_rewards = c.fetchone()[0]
+
+        # Total points awarded
+        c.execute("SELECT COALESCE(SUM(points), 0) FROM rewards")
+        total_points_awarded = c.fetchone()[0]
+
+        # Total pickup requests
+        c.execute("SELECT COUNT(*) FROM pickup_requests")
+        total_pickup_requests = c.fetchone()[0]
+
+        # Pending pickup requests
+        c.execute("SELECT COUNT(*) FROM pickup_requests WHERE status='PENDING_APPROVAL'")
+        pending_pickups = c.fetchone()[0]
+
+        # Approved pickup requests
+        c.execute("SELECT COUNT(*) FROM pickup_requests WHERE status='APPROVED'")
+        approved_pickups = c.fetchone()[0]
+
+        # Scheduled pickups
+        c.execute("SELECT COUNT(*) FROM pickup_requests WHERE status='SCHEDULED'")
+        scheduled_pickups = c.fetchone()[0]
+
+        # Completed pickups
+        c.execute("SELECT COUNT(*) FROM pickup_requests WHERE status='COMPLETED'")
+        completed_pickups = c.fetchone()[0]
+
+        # Rejected pickups
+        c.execute("SELECT COUNT(*) FROM pickup_requests WHERE status='REJECTED'")
+        rejected_pickups = c.fetchone()[0]
+
+        # Total redemptions
+        c.execute("SELECT COUNT(*) FROM redemptions")
+        total_redemptions = c.fetchone()[0]
+
+        conn.close()
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.metric("Total Users", total_users)
+            st.metric("Total Rewards Records", total_rewards)
+            st.metric("Total Points Awarded", total_points_awarded)
+            st.metric("Total Pickup Requests", total_pickup_requests)
+            st.metric("Pending Pickup Requests", pending_pickups)
+
+        with col2:
+            st.metric("Approved Pickup Requests", approved_pickups)
+            st.metric("Scheduled Pickups", scheduled_pickups)
+            st.metric("Completed Pickups", completed_pickups)
+            st.metric("Rejected Pickup Requests", rejected_pickups)
+            st.metric("Total Redemptions", total_redemptions)
 # =============================
 # USER FLOW
 # =============================
