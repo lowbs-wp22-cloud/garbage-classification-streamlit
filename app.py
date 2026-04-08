@@ -134,7 +134,7 @@ if st.session_state.user:
         if st.session_state.role == "USER":
             page = st.radio(
                 "Go to",
-                ["Home", "Upload Waste", "Reward Status", "Pickup Scheduling", "Reward History","Redeem Rewards","Redemption History" , "Logout"],
+                ["Home", "Upload Waste", "Reward Status", "Pickup Scheduling", "Reward History","Redeem Rewards","Redemption History","Profile", "Logout"],
                 key="user_page_nav"
             )
             st.session_state.page = page
@@ -782,3 +782,58 @@ elif st.session_state.role == "USER" and st.session_state.user:
                 st.markdown("---")
         else:
             st.info("No redemption history found yet.")
+            
+    elif st.session_state.page == "Profile":
+        st.subheader("👤 User Profile")
+
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+
+        # User info
+        c.execute("SELECT name, email FROM users WHERE email=?", (st.session_state.user,))
+        user_info = c.fetchone()
+
+        # Total earned points
+        c.execute("SELECT COALESCE(SUM(points), 0) FROM rewards WHERE user_email=?", (st.session_state.user,))
+        total_earned = c.fetchone()[0]
+
+        # Total redeemed points
+        c.execute("SELECT COALESCE(SUM(points_used), 0) FROM redemptions WHERE user_email=?", (st.session_state.user,))
+        total_redeemed = c.fetchone()[0]
+
+        # Total reward records
+        c.execute("SELECT COUNT(*) FROM rewards WHERE user_email=?", (st.session_state.user,))
+        total_reward_records = c.fetchone()[0]
+
+        # Total pickup requests
+        c.execute("SELECT COUNT(*) FROM pickup_requests WHERE user_email=?", (st.session_state.user,))
+        total_pickup_requests = c.fetchone()[0]
+
+        # Completed pickups
+        c.execute("SELECT COUNT(*) FROM pickup_requests WHERE user_email=? AND status='COMPLETED'", (st.session_state.user,))
+        completed_pickups = c.fetchone()[0]
+
+        conn.close()
+
+        available_points = total_earned - total_redeemed
+
+        if user_info:
+            name, email = user_info
+
+            st.write(f"**Name:** {name}")
+            st.write(f"**Email:** {email}")
+            st.write(f"**Role:** USER")
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.metric("Total Earned Points", total_earned)
+                st.metric("Available Points", available_points)
+                st.metric("Total Reward Records", total_reward_records)
+
+            with col2:
+                st.metric("Total Redeemed Points", total_redeemed)
+                st.metric("Total Pickup Requests", total_pickup_requests)
+                st.metric("Completed Pickups", completed_pickups)
+        else:
+            st.error("User profile not found.")
