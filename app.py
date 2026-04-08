@@ -14,7 +14,6 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 # =============================
 st.markdown("""
 <style>
-/* ===== NAVBAR ROW TUNING ===== */
 .nav-logo {
     font-size: 22px;
     font-weight: 800;
@@ -22,34 +21,42 @@ st.markdown("""
     letter-spacing: 1px;
 }
 
-.nav-link button {
+.nav-active {
+    color: #2fa4dc;
+    font-weight: 700;
+    font-size: 15px;
+    padding-top: 8px;
+}
+
+/* text-style buttons */
+div[data-testid="stButton"] button[kind="tertiary"] {
     background: transparent !important;
     border: none !important;
-    color: #7b8794 !important;
-    font-weight: 700 !important;
-    font-size: 15px !important;
     box-shadow: none !important;
-    padding-top: 10px !important;
-    padding-bottom: 10px !important;
+    color: #6f7782 !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    white-space: nowrap !important;
+    padding: 8px 4px !important;
 }
 
-.nav-link button:hover {
-    color: #2fa4dc !important;
+div[data-testid="stButton"] button[kind="tertiary"]:hover {
     background: transparent !important;
+    color: #2fa4dc !important;
+    border: none !important;
 }
 
-.nav-cta button {
+/* blue CTA button */
+div[data-testid="stButton"] button[kind="primary"] {
     background-color: #4aa3df !important;
     color: white !important;
     border: none !important;
     border-radius: 6px !important;
     font-weight: 700 !important;
-    font-size: 15px !important;
-    padding-top: 10px !important;
-    padding-bottom: 10px !important;
+    white-space: nowrap !important;
 }
 
-.nav-cta button:hover {
+div[data-testid="stButton"] button[kind="primary"]:hover {
     background-color: #3b94d1 !important;
     color: white !important;
 }
