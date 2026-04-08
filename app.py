@@ -353,13 +353,6 @@ if st.session_state.role is None:
         st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('</div></div>', unsafe_allow_html=True)
-    
-        index=None   # 👈 IMPORTANT: no default selection
-    )
-
-    if role_choice:
-        st.session_state.role = role_choice
-        st.rerun()
 
 # =============================
 # ADMIN LOGIN / SIGNUP
