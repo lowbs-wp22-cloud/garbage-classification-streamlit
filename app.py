@@ -19,6 +19,7 @@ st.markdown("""
     font-weight: 800;
     color: #2fa4dc;
     letter-spacing: 1px;
+    white-space: nowrap;
 }
 
 .nav-active {
@@ -54,6 +55,7 @@ div[data-testid="stButton"] button[kind="primary"] {
     border-radius: 6px !important;
     font-weight: 700 !important;
     white-space: nowrap !important;
+    padding: 10px 18px !important;
 }
 
 div[data-testid="stButton"] button[kind="primary"]:hover {
@@ -618,7 +620,7 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
 elif st.session_state.role == "USER" and st.session_state.user:
 
     if st.session_state.page == "Home":
-        nav1, nav2, nav3, nav4, nav5, nav6 = st.columns([3.5, 1.2, 1.2, 2.2, 2.5, 1.8])
+        nav1, nav2, nav3, nav4, nav5, nav6 = st.columns([4.2, 1.1, 1.2, 2.0, 2.3, 1.6])
 
         with nav1:
             st.markdown('<div class="nav-logo">♻️ SMART RECYCLING</div>', unsafe_allow_html=True)
