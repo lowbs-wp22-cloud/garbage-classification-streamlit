@@ -611,13 +611,18 @@ elif st.session_state.role == "USER" and st.session_state.user:
         if reward:
             points, status, station = reward
             st.info(f"You earned **{points} points** (Status: {status})")
+
             if status == "PENDING":
                 st.warning("Waiting for ADMIN approval...")
+
             elif status == "APPROVED":
-                st.success(f"Reward Approved! Delivered to: {station}")
+                if station == "Door-to-door pickup completed":
+                    st.success("Bulky waste pickup completed successfully. 30 points have been added to your account.")
+                else:
+                    st.success("Reward approved! You may drop off your recyclable items at one of the suggested recycling stations below.")
         else:
             st.info("No reward record found yet.")
-
+    
         st.markdown("### Suggested Recycling Stations")
 
         stations = [
