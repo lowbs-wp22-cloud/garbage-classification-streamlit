@@ -618,48 +618,33 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
 elif st.session_state.role == "USER" and st.session_state.user:
 
     if st.session_state.page == "Home":
-        # =============================
-        # NAVBAR (REPLACE OLD ONE WITH THIS)
-        # =============================
         nav1, nav2, nav3, nav4, nav5, nav6 = st.columns([3.5, 1.2, 1.2, 2.2, 2.5, 1.8])
-        
+
         with nav1:
             st.markdown('<div class="nav-logo">♻️ SMART RECYCLING</div>', unsafe_allow_html=True)
 
         with nav2:
-            st.markdown('<div class="nav-link">', unsafe_allow_html=True)
-            if st.button("HOME", use_container_width=True, key="nav_home"):
-                st.session_state.page = "Home"
-                st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown('<div class="nav-active">HOME</div>', unsafe_allow_html=True)
 
         with nav3:
-            st.markdown('<div class="nav-link">', unsafe_allow_html=True)
-            if st.button("ABOUT", use_container_width=True, key="nav_about"):
+            if st.button("ABOUT", key="nav_about", type="tertiary", use_container_width=True):
                 st.session_state.page = "Profile"
                 st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
 
         with nav4:
-            st.markdown('<div class="nav-link">', unsafe_allow_html=True)
-            if st.button("HOW IT WORKS", use_container_width=True, key="nav_how"):
+            if st.button("HOW IT WORKS", key="nav_how", type="tertiary", use_container_width=True):
                 st.session_state.page = "Upload Waste"
                 st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
 
         with nav5:
-            st.markdown('<div class="nav-link">', unsafe_allow_html=True)
-            if st.button("PARTNER BENEFITS", use_container_width=True, key="nav_partner"):
+            if st.button("PARTNER BENEFITS", key="nav_partner", type="tertiary", use_container_width=True):
                 st.session_state.page = "Reward Status"
                 st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
 
         with nav6:
-            st.markdown('<div class="nav-cta">', unsafe_allow_html=True)
-            if st.button("INSTANT QUOTE", use_container_width=True, key="nav_quote"):
+            if st.button("INSTANT QUOTE", key="nav_quote", type="primary", use_container_width=True):
                 st.session_state.page = "Redeem Rewards"
                 st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
 
         st.markdown("<hr style='margin-top:10px; margin-bottom:20px;'>", unsafe_allow_html=True)
         # =============================
