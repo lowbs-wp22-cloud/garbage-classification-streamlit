@@ -12,6 +12,36 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 # =============================
 # CUSTOM CSS (UI DESIGN)
 # =============================
+st.markdown("""
+<style>
+.nav-logo {
+    font-size: 22px;
+    font-weight: 800;
+    color: #2fa4dc;
+}
+
+.nav-link button {
+    background: transparent !important;
+    border: none !important;
+    color: #7b8794 !important;
+    font-weight: 700 !important;
+}
+
+.nav-link button:hover {
+    color: #2fa4dc !important;
+}
+
+.nav-cta button {
+    background-color: #4aa3df !important;
+    color: white !important;
+    border-radius: 6px !important;
+}
+
+.nav-cta button:hover {
+    background-color: #3b94d1 !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
 st.markdown("""
 <style>
