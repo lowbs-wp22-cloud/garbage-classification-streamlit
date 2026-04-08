@@ -208,39 +208,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-<style>
 
-/* 🔥 Radio labels (Login / Sign Up) */
-div[role="radiogroup"] label {
-    color: white !important;
-    font-weight: 600 !important;
-}
-
-/* 🔥 Input labels (Email, Password, etc.) */
-label {
-    color: white !important;
-    font-weight: 600 !important;
-}
-
-/* 🔥 Placeholder text inside input */
-input::placeholder {
-    color: rgba(255,255,255,0.6) !important;
-}
-
-/* 🔥 Text inside input fields */
-div[data-testid="stTextInput"] input {
-    color: black !important;
-    background-color: white !important;
-}
-
-/* 🔥 Password eye icon visibility */
-svg {
-    color: black !important;
-}
-
-</style>
-""", unsafe_allow_html=True)
 # =============================
 # PAGE CONFIG
 # =============================
