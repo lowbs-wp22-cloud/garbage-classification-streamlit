@@ -280,7 +280,7 @@ if st.session_state.role is None:
     <style>
     .landing-container {
         height: 90vh;
-        background-image: url("https://images.unsplash.com/photo-1618477461853-cf6ed80faba5");
+        background-image: url("https://www.freepik.com/premium-photo/sign-recycling-hologram-tablet-hand-concept-clean-land-garbage-disposal_9784835.htm#fromView=keyword&page=1&position=17&uuid=8556c74b-3ff0-43e4-a402-df57b5d03dec&query=Smart+recycling");
         background-size: cover;
         background-position: center;
         border-radius: 12px;
