@@ -994,36 +994,6 @@ elif st.session_state.role == "USER" and st.session_state.user:
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
 
-        # user info
-        c.execute("SELECT name, email FROM users WHERE email=?", (st.session_state.user,))
-        user_info = c.fetchone()
-
-        # total earned points
-        c.execute("SELECT COALESCE(SUM(points), 0) FROM rewards WHERE user_email=?", (st.session_state.user,))
-        total_earned = c.fetchone()[0]
-
-        # total redeemed points
-        c.execute("SELECT COALESCE(SUM(points_used), 0) FROM redemptions WHERE user_email=?", (st.session_state.user,))
-        total_redeemed = c.fetchone()[0]
-
-        # total reward records
-        c.execute("SELECT COUNT(*) FROM rewards WHERE user_email=?", (st.session_state.user,))
-        total_reward_records = c.fetchone()[0]
-
-        # total pickup requests
-        c.execute("SELECT COUNT(*) FROM pickup_requests WHERE user_email=?", (st.session_state.user,))
-        total_pickup_requests = c.fetchone()[0]
-
-        # completed pickups
-        c.execute("SELECT COUNT(*) FROM pickup_requests WHERE user_email=? AND status='COMPLETED'", (st.session_state.user,))
-        completed_pickups = c.fetchone()[0]
-
-        # total redemptions
-        c.execute("SELECT COUNT(*) FROM redemptions WHERE user_email=?", (st.session_state.user,))
-        total_redemptions = c.fetchone()[0]
-
-        conn.close()
-
             col1, col2, col3, col4 = st.columns(4)
 
             with col1:
