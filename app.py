@@ -913,7 +913,7 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
 elif st.session_state.role == "USER" and st.session_state.user:
 
     if st.session_state.page == "Home":
-        nav1, nav2, nav3, nav4, nav5, nav6 = st.columns([2.8, 1.0, 1.8, 2.2, 2.0, 1.4])
+        nav1, nav2, nav3, nav4, nav5, nav6 = st.columns([3.2, 1.2, 2.0, 2.4, 2.2, 1.6])
 
         with nav1:
             st.markdown('<div class="nav-logo">♻️ SMART RECYCLING</div>', unsafe_allow_html=True)
