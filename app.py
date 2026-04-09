@@ -935,40 +935,35 @@ elif st.session_state.role == "USER" and st.session_state.user:
             st.markdown('<div class="nav-active">HOME</div>', unsafe_allow_html=True)
         else:
             if st.button("HOME", key="nav_home", type="tertiary", use_container_width=True):
-                st.session_state.page = "Home"
-                st.rerun()
+                goto_user_page("Home")
 
     with nav3:
         if st.session_state.page == "Reward History":
             st.markdown('<div class="nav-active">REWARD<br>HISTORY</div>', unsafe_allow_html=True)
         else:
             if st.button("REWARD\nHISTORY", key="nav_reward_history", type="tertiary", use_container_width=True):
-                st.session_state.page = "Reward History"
-                st.rerun()
+                goto_user_page("Reward History")
 
     with nav4:
         if st.session_state.page == "Redemption History":
             st.markdown('<div class="nav-active">REDEMPTION<br>HISTORY</div>', unsafe_allow_html=True)
         else:
             if st.button("REDEMPTION\nHISTORY", key="nav_redemption_history", type="tertiary", use_container_width=True):
-                st.session_state.page = "Redemption History"
-                st.rerun()
+                goto_user_page("Redemption History")
 
     with nav5:
         if st.session_state.page == "Redeem Rewards":
             st.markdown('<div class="nav-active">REDEEM<br>REWARDS</div>', unsafe_allow_html=True)
         else:
             if st.button("REDEEM\nREWARDS", key="nav_redeem_rewards", type="tertiary", use_container_width=True):
-                st.session_state.page = "Redeem Rewards"
-                st.rerun()
+                goto_user_page("Redeem Rewards")
 
     with nav6:
         if st.session_state.page == "Profile":
             st.markdown('<div class="nav-active">PROFILE</div>', unsafe_allow_html=True)
         else:
             if st.button("PROFILE", key="nav_profile", type="tertiary", use_container_width=True):
-                st.session_state.page = "Profile"
-                st.rerun()
+                goto_user_page("Profile")
 
     st.markdown("<hr style='margin-top:10px; margin-bottom:20px;'>", unsafe_allow_html=True)
     
