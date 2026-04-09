@@ -1020,13 +1020,65 @@ elif st.session_state.role == "USER" and st.session_state.user:
             st.markdown("### Quick Guide")
             st.info("Use the sidebar to upload waste, check reward status, schedule pickup, redeem rewards, and view your profile.")
 
-    elif st.session_state.page == "Upload Waste" and st.session_state.category is None:
-        st.subheader("Select Category")
-        category = st.radio("Choose waste type", ["General Waste", "Furniture"])
-        if st.button("Continue"):
-            st.session_state.category = category
-            st.rerun()
+        elif st.session_state.page == "Upload Waste" and st.session_state.category is None:
+        st.markdown("## Select Category")
+        st.markdown("**Step 1 of 3** · Choose the type of waste you want to classify")
 
+        st.write(
+            "Select the most suitable category below before continuing to image upload."
+        )
+
+        card1, card2 = st.columns(2)
+
+        with card1:
+            st.markdown("""
+            <div style="
+                background-color: white;
+                border: 1px solid #d9e2ec;
+                border-radius: 14px;
+                padding: 18px;
+                min-height: 180px;
+                box-shadow: 0px 2px 8px rgba(0,0,0,0.05);
+            ">
+                <h3 style="margin-top:0;">♻️ General Waste</h3>
+                <p>Use this for everyday waste items such as paper, plastic, glass, metal, and trash.</p>
+                <p><strong>Flow:</strong> Upload image → AI classification → reward processing</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with card2:
+            st.markdown("""
+            <div style="
+                background-color: white;
+                border: 1px solid #d9e2ec;
+                border-radius: 14px;
+                padding: 18px;
+                min-height: 180px;
+                box-shadow: 0px 2px 8px rgba(0,0,0,0.05);
+            ">
+                <h3 style="margin-top:0;">🪑 Furniture</h3>
+                <p>Use this for bulky household items such as chairs, tables, fridges, TVs, and wardrobes.</p>
+                <p><strong>Flow:</strong> Upload image → approval → pickup scheduling</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        category = st.radio(
+            "Choose waste type",
+            ["General Waste", "Furniture"],
+            horizontal=True
+        )
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        btn_left, btn_center, btn_right = st.columns([1, 1, 1])
+
+        with btn_center:
+            if st.button("Continue", use_container_width=True):
+                st.session_state.category = category
+                st.rerun()
+                
     elif st.session_state.page == "Upload Waste" and st.session_state.reward_pending is None:
         st.subheader("Upload Image")
 
