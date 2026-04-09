@@ -920,11 +920,10 @@ elif st.session_state.role == "USER" and st.session_state.user:
                 goto_user_page("Redemption History")
 
     with nav5:
-        if st.session_state.page == "Redeem Rewards":
-            st.markdown('<div class="nav-active">QUICK<br>ACTION</div>', unsafe_allow_html=True)
-        else:
-            if st.button("QUICK\nACTION", key="nav_redeem_rewards", type="tertiary", use_container_width=True):
-                goto_user_page("Redeem Rewards")
+        if st.button("LOGOUT", key="nav_logout", type="tertiary", use_container_width=True):
+            for key in ["role", "user", "category", "reward_pending", "show_reward", "page"]:
+                st.session_state[key] = None
+            st.rerun()
                 
     with nav6:
         if st.session_state.page == "Profile":
