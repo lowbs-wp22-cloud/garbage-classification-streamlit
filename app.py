@@ -517,15 +517,23 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
     st.markdown("""
     <style>
 
-    /* ONLY labels (Choose an option, Email, Password, Confirm Password) */
-
-    /* radio label text (Login / Sign Up) */
-    div[role="radiogroup"] label p {
+    /* ALL form labels (Choose an option, Email, Password, Confirm Password) */
+    div[data-testid="stWidgetLabel"] {
         color: white !important;
     }
 
-    </style>
-    """, unsafe_allow_html=True)
+    /* radio labels (Login / Sign Up) */
+    div[role="radiogroup"] label {
+        color: white !important;
+    }
+
+/* radio label text */
+div[role="radiogroup"] label p {
+    color: white !important;
+}
+
+</style>
+""", unsafe_allow_html=True)
     
     st.markdown("""
     <style>
