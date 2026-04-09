@@ -40,7 +40,7 @@ div[data-testid="stButton"] button[kind="tertiary"] {
     color: #6f7782 !important;
     font-weight: 600 !important;
     font-size: 15px !important;
-    white-space: normal !important;
+    white-space: pre-line !important;
     text-align: center !important;
     line-height: 1.2 !important;
     padding: 8px 4px !important;
