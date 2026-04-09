@@ -514,7 +514,22 @@ if st.session_state.role == "ADMIN" and st.session_state.user is None:
 # USER LOGIN / SIGNUP
 # =============================
 elif st.session_state.role == "USER" and st.session_state.user is None:
+    st.markdown("""
+    <style>
 
+    /* ONLY labels (Choose an option, Email, Password, Confirm Password) */
+    div[data-testid="stWidgetLabel"] label {
+        color: white !important;
+    }
+
+    /* radio label text (Login / Sign Up) */
+    div[role="radiogroup"] label p {
+        color: white !important;
+    }
+
+    </style>
+    """, unsafe_allow_html=True)
+    
     st.markdown("""
     <style>
     [data-testid="stAppViewContainer"] {
