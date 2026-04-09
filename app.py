@@ -915,63 +915,81 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
 # =============================
 elif st.session_state.role == "USER" and st.session_state.user:
 
+    # TOP NAVBAR FOR ALL USER PAGES
     nav1, nav2, nav3, nav4, nav5, nav6 = st.columns([3.2, 1.2, 2.0, 2.4, 2.2, 1.6])
 
-        with nav1:
-            st.markdown('<div class="nav-logo">♻️ SMART<br>RECYCLING</div>', unsafe_allow_html=True)
+    with nav1:
+        st.markdown('<div class="nav-logo">♻️ SMART<br>RECYCLING</div>', unsafe_allow_html=True)
 
-        with nav2:
-            if st.session_state.page == "Home":
-                st.markdown('<div class="nav-active">HOME</div>', unsafe_allow_html=True)
-            else:
-                if st.button("HOME", key="nav_home", type="tertiary", use_container_width=True):
-                    st.session_state.page = "Home"
-                    st.rerun()
-
-        with nav3:
-            if st.session_state.page == "Reward History":
-                st.markdown('<div class="nav-active">REWARD<br>HISTORY</div>', unsafe_allow_html=True)
-            else:
-                if st.button("REWARD HISTORY", key="nav_reward_history", type="tertiary", use_container_width=True):
-                    st.session_state.page = "Reward History"
-                    st.rerun()
-
-        with nav4:
-            if st.session_state.page == "Redemption History":
-                st.markdown('<div class="nav-active">REDEMPTION<br>HISTORY</div>', unsafe_allow_html=True)
-            else:
-                if st.button("REDEMPTION\nHISTORY", key="nav_redemption_history", type="tertiary", use_container_width=True):
-                    st.session_state.page = "Redemption History"
-                    st.rerun()
-
-        with nav5:
-            if st.session_state.page == "Redeem Rewards":
-                st.markdown('<div class="nav-active">REDEEM<br>REWARDS</div>', unsafe_allow_html=True)
-            else:
-                if st.button("REDEEM\nREWARDS", key="nav_redeem_rewards", type="tertiary", use_container_width=True):
-                    st.session_state.page = "Redeem Rewards"
-                    st.rerun()
-
-        with nav6:
-            if st.session_state.page == "Profile":
-                st.markdown('<div class="nav-active">PROFILE</div>', unsafe_allow_html=True)
-            else:
-                if st.button("PROFILE", key="nav_profile", type="tertiary", use_container_width=True):
-                    st.session_state.page = "Profile"
-                    st.rerun()
-    
-        st.markdown("<hr style='margin-top:10px; margin-bottom:20px;'>", unsafe_allow_html=True)
-
+    with nav2:
         if st.session_state.page == "Home":
-            if st.session_state.role == "USER" and st.session_state.user and st.session_state.page == "Home":
-                st.markdown("""
-                <style>
-                button[kind="tertiary"][data-testid="baseButton-secondary"][aria-label="HOME"] {
-                    color: #2fa4dc !important;
-                    font-weight: 700 !important;
-                }
-                </style>
-                """, unsafe_allow_html=True)
+            st.markdown('<div class="nav-active">HOME</div>', unsafe_allow_html=True)
+        else:
+            if st.button("HOME", key="nav_home", type="tertiary", use_container_width=True):
+                st.session_state.page = "Home"
+                st.rerun()
+
+    with nav3:
+        if st.session_state.page == "Reward History":
+            st.markdown('<div class="nav-active">REWARD<br>HISTORY</div>', unsafe_allow_html=True)
+        else:
+            if st.button("REWARD\nHISTORY", key="nav_reward_history", type="tertiary", use_container_width=True):
+                st.session_state.page = "Reward History"
+                st.rerun()
+
+    with nav4:
+        if st.session_state.page == "Redemption History":
+            st.markdown('<div class="nav-active">REDEMPTION<br>HISTORY</div>', unsafe_allow_html=True)
+        else:
+            if st.button("REDEMPTION\nHISTORY", key="nav_redemption_history", type="tertiary", use_container_width=True):
+                st.session_state.page = "Redemption History"
+                st.rerun()
+
+    with nav5:
+        if st.session_state.page == "Redeem Rewards":
+            st.markdown('<div class="nav-active">REDEEM<br>REWARDS</div>', unsafe_allow_html=True)
+        else:
+            if st.button("REDEEM\nREWARDS", key="nav_redeem_rewards", type="tertiary", use_container_width=True):
+                st.session_state.page = "Redeem Rewards"
+                st.rerun()
+
+    with nav6:
+        if st.session_state.page == "Profile":
+            st.markdown('<div class="nav-active">PROFILE</div>', unsafe_allow_html=True)
+        else:
+            if st.button("PROFILE", key="nav_profile", type="tertiary", use_container_width=True):
+                st.session_state.page = "Profile"
+                st.rerun()
+
+    st.markdown("<hr style='margin-top:10px; margin-bottom:20px;'>", unsafe_allow_html=True)
+    
+    if st.session_state.page == "Home":
+        st.markdown("""
+        <div style="
+            background-image: url('https://images.unsplash.com/photo-1604187351574-c75ca79f5807');
+            height: 300px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 12px;
+            position: relative;
+            margin-bottom: 20px;
+        ">
+            <div style="
+                position: absolute;
+                bottom: 20px;
+                left: 30px;
+                color: white;
+            ">
+                <h1 style="margin-bottom:5px;">♻️ Smart Recycling Reward System</h1>
+                <p style="font-size:18px;">Earn rewards while saving the environment</p>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("### Welcome to your recycling dashboard")
+
+        # your Home dashboard code continues here
         
         # =============================
         # HERO BANNER 
