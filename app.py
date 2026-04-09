@@ -555,8 +555,8 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
     # full-page auth background
    st.markdown("""
    <style>
-    div[data-testid="stWidgetLabel"] {
-        color: white !important;
+   div[data-testid="stWidgetLabel"] {
+       color: white !important;
     }
     div[role="radiogroup"] label p {
         color: white !important;
