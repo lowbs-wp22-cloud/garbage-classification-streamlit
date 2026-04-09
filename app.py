@@ -289,20 +289,25 @@ if st.session_state.user:
                 st.title("Navigation")
 
                 if st.session_state.role == "USER":
-                    user_pages = ["Home", "Upload Waste", "Reward Status", "Pickup Scheduling", "Reward History", "Redeem Rewards", "Redemption History", "Profile", "Logout"]
+                    sidebar_pages = ["Home", "Upload Waste", "Reward Status", "Pickup Scheduling", "Logout"]
+                    top_nav_only_pages = ["Reward History", "Redemption History", "Redeem Rewards", "Profile"]
+                    allowed_pages = sidebar_pages + top_nav_only_pages
 
-                    if st.session_state.page not in user_pages:
+                    if st.session_state.page not in allowed_pages:
                         st.session_state.page = "Home"
 
-                    current_index = user_pages.index(st.session_state.page)
+                    sidebar_current = st.session_state.page if st.session_state.page in sidebar_pages else "Home"
+                    current_index = sidebar_pages.index(sidebar_current)
 
                     page = st.radio(
                         "Go to",
-                        user_pages,
+                        sidebar_pages,
                         index=current_index,
                         key="user_page_nav"
                     )
-                    st.session_state.page = page
+
+                    if page != sidebar_current:
+                        st.session_state.page = page
 
         elif st.session_state.role == "ADMIN":
             page = st.radio(
