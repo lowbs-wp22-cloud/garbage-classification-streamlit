@@ -1258,16 +1258,29 @@ elif st.session_state.role == "USER" and st.session_state.user:
             FROM pickup_requests
             WHERE user_email=? AND status='APPROVED'
             ORDER BY created_at DESC
-            LIMIT 1
         """, (st.session_state.user,))
-        approved_request = c.fetchone()
+        approved_requests = c.fetchall()
         conn.close()
 
-        if approved_request:
-            request_id, predicted_label, status = approved_request
+        if approved_requests:
+            st.info(f"Approved pickup items: {len(approved_requests)}")
+            st.success("Your pickup request(s) have been approved. Please select one item to schedule.")
 
-            st.info(f"Approved bulky item: {predicted_label}")
-            st.success("Your pickup request has been approved. Please schedule your pickup.")
+            st.markdown("### Items approved by admin")
+            for _, label, _ in approved_requests:
+                st.write(f"- {label}")
+
+            item_options = {
+                f"{label} (Request ID: {request_id})": request_id
+                for request_id, label, _ in approved_requests
+            }
+
+            selected_item = st.selectbox(
+                "Select approved item to schedule",
+                list(item_options.keys())
+            )
+
+            selected_request_id = item_options[selected_item]
 
             address = st.text_area("Pickup Address")
             pickup_date = st.date_input("Select Pickup Date")
@@ -1287,11 +1300,11 @@ elif st.session_state.role == "USER" and st.session_state.user:
                         UPDATE pickup_requests
                         SET address=?, pickup_date=?, pickup_time_slot=?, note=?, status='SCHEDULED'
                         WHERE id=?
-                    """, (address, str(pickup_date), pickup_time_slot, note, request_id))
+                    """, (address, str(pickup_date), pickup_time_slot, note, selected_request_id))
                     conn.commit()
                     conn.close()
 
-                    st.success("✅ Pickup scheduled successfully!")
+                    st.success("✅ Selected pickup item scheduled successfully!")
                     st.rerun()
         else:
             st.info("No approved pickup request available for scheduling yet.")
