@@ -113,65 +113,6 @@ h1, h2, h3 {
 
 st.markdown("""
 <style>
-.auth-bg {
-    background-image: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)),
-                      url("https://images.unsplash.com/photo-1621451537084-482c73073a0f");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    border-radius: 20px;
-    min-height: 80vh;
-    padding: 60px 30px;
-}
-
-.auth-page-space {
-    height: 4vh;
-}
-
-.auth-card {
-    background: rgba(255,255,255,0.12);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 20px;
-    padding: 35px 30px;
-    max-width: 700px;
-    margin: 0 auto;
-}
-
-.auth-title {
-    text-align: center;
-    color: white;
-    font-size: 42px;
-    font-weight: 800;
-    margin-bottom: 10px;
-}
-
-.auth-subtitle {
-    text-align: center;
-    color: rgba(255,255,255,0.92);
-    font-size: 18px;
-    margin-bottom: 25px;
-}
-
-.auth-note {
-    text-align: center;
-    color: rgba(255,255,255,0.88);
-    margin-bottom: 20px;
-}
-
-div[data-testid="stTextInput"] input {
-    border-radius: 12px !important;
-}
-
-div[role="radiogroup"] label {
-    color: white !important;
-    font-weight: 500 !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-<style>
 .auth-title-center {
     text-align: center;
     color: white;
@@ -192,18 +133,6 @@ st.markdown("""
     color: rgba(255,255,255,0.88);
     font-size: 15px;
     margin-bottom: 18px;
-}
-
-.auth-box {
-    background: rgba(255,255,255,0.10);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.20);
-    border-radius: 18px;
-    padding: 30px 26px;
-}
-
-.auth-back-space {
-    margin-bottom: 14px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -466,7 +395,6 @@ if st.session_state.role is None:
 # =============================
 if st.session_state.role == "ADMIN" and st.session_state.user is None:
 
-    # full-page auth background
     st.markdown("""
     <style>
     [data-testid="stAppViewContainer"] {
@@ -477,8 +405,47 @@ if st.session_state.role == "ADMIN" and st.session_state.user is None:
         background-repeat: no-repeat;
         background-attachment: fixed;
     }
+
     [data-testid="stHeader"] {
         background: rgba(0,0,0,0);
+    }
+
+    .auth-title-center {
+        text-align: center;
+        color: white;
+        font-size: 46px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .auth-subtitle-center {
+        text-align: center;
+        color: rgba(255,255,255,0.92);
+        font-size: 18px;
+        margin-bottom: 28px;
+    }
+
+    .auth-note-center {
+        text-align: center;
+        color: rgba(255,255,255,0.88);
+        font-size: 15px;
+        margin-bottom: 18px;
+    }
+
+    div[data-testid="stWidgetLabel"] {
+        color: white !important;
+        font-weight: 600 !important;
+    }
+
+    div[role="radiogroup"] label p {
+        color: white !important;
+        font-weight: 600 !important;
+    }
+
+    div[data-testid="stTextInput"] input {
+        background-color: rgba(255,255,255,0.95) !important;
+        color: black !important;
+        border-radius: 12px !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -491,8 +458,6 @@ if st.session_state.role == "ADMIN" and st.session_state.user is None:
         st.markdown('<div class="auth-title-center">🛠 ADMIN Login / Sign Up</div>', unsafe_allow_html=True)
         st.markdown('<div class="auth-subtitle-center">Manage rewards, pickups, approvals, and analytics</div>', unsafe_allow_html=True)
         st.markdown('<div class="auth-note-center">Choose an option to continue</div>', unsafe_allow_html=True)
-
-        st.markdown('<div class="auth-box">', unsafe_allow_html=True)
 
         if st.button("← Back to Role Selection", key="back_from_admin"):
             st.session_state.role = None
@@ -545,21 +510,62 @@ if st.session_state.role == "ADMIN" and st.session_state.user is None:
                         conn.close()
                         st.success("Admin Sign Up successful! Please login.")
 
-        st.markdown("</div>", unsafe_allow_html=True)
-
 # =============================
 # USER LOGIN / SIGNUP
 # =============================
 elif st.session_state.role == "USER" and st.session_state.user is None:
 
-    # full-page auth background
     st.markdown("""
     <style>
+    [data-testid="stAppViewContainer"] {
+        background-image: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)),
+                          url("https://images.unsplash.com/photo-1621451537084-482c73073a0f");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+
+    [data-testid="stHeader"] {
+        background: rgba(0,0,0,0);
+    }
+
+    .auth-title-center {
+        text-align: center;
+        color: white;
+        font-size: 46px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .auth-subtitle-center {
+        text-align: center;
+        color: rgba(255,255,255,0.92);
+        font-size: 18px;
+        margin-bottom: 28px;
+    }
+
+    .auth-note-center {
+        text-align: center;
+        color: rgba(255,255,255,0.88);
+        font-size: 15px;
+        margin-bottom: 18px;
+    }
+
     div[data-testid="stWidgetLabel"] {
         color: white !important;
+        font-weight: 600 !important;
     }
+
     div[role="radiogroup"] label p {
         color: white !important;
+        font-weight: 600 !important;
+    }
+
+    div[data-testid="stTextInput"] input {
+        background-color: rgba(255,255,255,0.95) !important;
+        color: black !important;
+        border-radius: 12px !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -572,8 +578,6 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
         st.markdown('<div class="auth-title-center">👤 USER Login / Sign Up</div>', unsafe_allow_html=True)
         st.markdown('<div class="auth-subtitle-center">Access your recycling account and continue your sustainability journey</div>', unsafe_allow_html=True)
         st.markdown('<div class="auth-note-center">Choose an option to continue</div>', unsafe_allow_html=True)
-
-        st.markdown('<div class="auth-box">', unsafe_allow_html=True)
 
         if st.button("← Back to Role Selection", key="back_from_user"):
             st.session_state.role = None
@@ -609,8 +613,6 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
                     st.success("Sign Up successful! Please login.")
                 else:
                     st.error("Email already registered")
-
-        st.markdown("</div>", unsafe_allow_html=True)
 # =============================
 # LOGOUT HANDLER
 # =============================
