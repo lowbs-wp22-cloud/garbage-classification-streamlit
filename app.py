@@ -563,8 +563,7 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
     }
     </style>
     """, unsafe_allow_html=True)
-
-    st.markdown("<div style='height:12vh;'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height:12vh;'></div>", unsafe_allow_html=True)
 
     left, center, right = st.columns([1.2, 2.2, 1.2])
 
