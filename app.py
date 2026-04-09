@@ -699,12 +699,12 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
 
     # LOGOUT
     with nav7:
-        if st.button("LOGOUT", key="admin_logout", type="tertiary", use_container_width=True):
+        if st.button("LOG\nOUT", key="admin_logout", type="tertiary", use_container_width=True):
             for key in ["role", "user", "category", "reward_pending", "show_reward", "page"]:
                 st.session_state[key] = None
             st.rerun()
 
-    st.markdown("<hr style='margin-top:10px; margin-bottom:20px;'>", unsafe_allow_html=True)
+    st.markdown('<div class="nav-active">LOG<br>OUT</div>', unsafe_allow_html=True)
     if st.session_state.page == "Home":
         # =============================
         # HERO BANNER 
