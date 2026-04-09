@@ -467,11 +467,15 @@ if st.session_state.role == "ADMIN" and st.session_state.user is None:
             st.session_state.role = None
             st.rerun()
 
-        option = st.radio("Choose an option", ["Login", "Sign Up"], key="admin_option")
+        st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Choose an option</p>", unsafe_allow_html=True)
+        option = st.radio("", ["Login", "Sign Up"], key="admin_option", label_visibility="collapsed")
 
         if option == "Login":
-            staff_id = st.text_input("Staff ID", key="admin_login_id")
-            password = st.text_input("Password", type="password", key="admin_login_pw")
+            st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Staff ID</p>", unsafe_allow_html=True)
+            staff_id = st.text_input("", key="admin_login_id", label_visibility="collapsed")
+
+            st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Password</p>", unsafe_allow_html=True)
+            password = st.text_input("", type="password", key="admin_login_pw", label_visibility="collapsed")
 
             if st.button("Login", key="admin_login_btn"):
                 conn = sqlite3.connect(DB_PATH)
@@ -489,11 +493,20 @@ if st.session_state.role == "ADMIN" and st.session_state.user is None:
                     st.error("Invalid StaffID or Password")
 
         elif option == "Sign Up":
-            staff_id = st.text_input("Staff ID", key="admin_signup_id")
-            name = st.text_input("Name", key="admin_signup_name")
-            email = st.text_input("Email", key="admin_signup_email")
-            password = st.text_input("Password", type="password", key="admin_signup_pw")
-            confirm = st.text_input("Confirm Password", type="password", key="admin_signup_confirm")
+            st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Staff ID</p>", unsafe_allow_html=True)
+            staff_id = st.text_input("", key="admin_signup_id", label_visibility="collapsed")
+
+            st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Name</p>", unsafe_allow_html=True)
+            name = st.text_input("", key="admin_signup_name", label_visibility="collapsed")
+
+            st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Email</p>", unsafe_allow_html=True)
+            email = st.text_input("", key="admin_signup_email", label_visibility="collapsed")
+
+            st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Password</p>", unsafe_allow_html=True)
+            password = st.text_input("", type="password", key="admin_signup_pw", label_visibility="collapsed")
+
+            st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Confirm Password</p>", unsafe_allow_html=True)
+            confirm = st.text_input("", type="password", key="admin_signup_confirm", label_visibility="collapsed")
 
             if st.button("Sign Up", key="admin_signup_btn"):
                 if password != confirm:
@@ -595,8 +608,11 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
         option = st.radio("", ["Login", "Sign Up"], key="user_option", label_visibility="collapsed")
         
         if option == "Login":
-            email = st.text_input("Email", key="user_login_email")
-            password = st.text_input("Password", type="password", key="user_login_pw")
+            st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Email</p>", unsafe_allow_html=True)
+            email = st.text_input("", key="user_login_email", label_visibility="collapsed")
+
+            st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Password</p>", unsafe_allow_html=True)
+            password = st.text_input("", type="password", key="user_login_pw", label_visibility="collapsed")
 
             if st.button("Login", key="user_login_btn"):
                 if login_user(email, password):
@@ -608,10 +624,17 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
                     st.error("Invalid Email or Password")
 
         elif option == "Sign Up":
-            name = st.text_input("Name", key="user_signup_name")
-            email = st.text_input("Email", key="user_signup_email")
-            password = st.text_input("Password", type="password", key="user_signup_pw")
-            confirm = st.text_input("Confirm Password", type="password", key="user_signup_confirm")
+            st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Name</p>", unsafe_allow_html=True)
+            name = st.text_input("", key="user_signup_name", label_visibility="collapsed")
+
+            st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Email</p>", unsafe_allow_html=True)
+            email = st.text_input("", key="user_signup_email", label_visibility="collapsed")
+
+            st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Password</p>", unsafe_allow_html=True)
+            password = st.text_input("", type="password", key="user_signup_pw", label_visibility="collapsed")
+
+            st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Confirm Password</p>", unsafe_allow_html=True)
+            confirm = st.text_input("", type="password", key="user_signup_confirm", label_visibility="collapsed")
 
             if st.button("Sign Up", key="user_signup_btn"):
                 if password != confirm:
