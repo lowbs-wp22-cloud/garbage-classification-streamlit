@@ -321,6 +321,7 @@ if st.session_state.user:
                 key="admin_page_nav"
             )
             st.session_state.page = page
+
 # =============================
 # ROLE SELECTION (FIXED)
 # =============================
