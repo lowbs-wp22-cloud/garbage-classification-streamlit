@@ -283,12 +283,6 @@ def signup_user(name, email, password):
 
 def goto_user_page(page_name):
     st.session_state.page = page_name
-
-    if page_name in ["Home", "Upload Waste", "Reward Status", "Pickup Scheduling", "Logout"]:
-        st.session_state.user_page_nav = page_name
-    else:
-        st.session_state.user_page_nav = "Home"
-
     st.rerun()
 # =============================
 # SIDEBAR NAVIGATION
