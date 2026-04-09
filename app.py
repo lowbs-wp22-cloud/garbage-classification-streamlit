@@ -932,7 +932,7 @@ elif st.session_state.role == "USER" and st.session_state.user:
             if st.session_state.page == "Reward History":
                 st.markdown('<div class="nav-active">REWARD<br>HISTORY</div>', unsafe_allow_html=True)
             else:
-                if st.button("REWARD\nHISTORY", key="nav_reward_history", type="tertiary", use_container_width=True):
+                if st.button("REWARD HISTORY", key="nav_reward_history", type="tertiary", use_container_width=True):
                     st.session_state.page = "Reward History"
                     st.rerun()
 
