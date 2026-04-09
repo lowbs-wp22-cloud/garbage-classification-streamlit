@@ -1341,56 +1341,96 @@ elif st.session_state.role == "USER" and st.session_state.user:
             st.info("No redemption history found yet.")
             
     elif st.session_state.page == "Profile":
-        st.subheader("👤 User Profile")
+        st.title("Profile")
 
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
 
-        # User info
+        # user info
         c.execute("SELECT name, email FROM users WHERE email=?", (st.session_state.user,))
         user_info = c.fetchone()
 
-        # Total earned points
+        # total earned points
         c.execute("SELECT COALESCE(SUM(points), 0) FROM rewards WHERE user_email=?", (st.session_state.user,))
         total_earned = c.fetchone()[0]
 
-        # Total redeemed points
+        # total redeemed points
         c.execute("SELECT COALESCE(SUM(points_used), 0) FROM redemptions WHERE user_email=?", (st.session_state.user,))
         total_redeemed = c.fetchone()[0]
 
-        # Total reward records
+        # total reward records
         c.execute("SELECT COUNT(*) FROM rewards WHERE user_email=?", (st.session_state.user,))
         total_reward_records = c.fetchone()[0]
 
-        # Total pickup requests
+        # total pickup requests
         c.execute("SELECT COUNT(*) FROM pickup_requests WHERE user_email=?", (st.session_state.user,))
         total_pickup_requests = c.fetchone()[0]
 
-        # Completed pickups
+        # completed pickups
         c.execute("SELECT COUNT(*) FROM pickup_requests WHERE user_email=? AND status='COMPLETED'", (st.session_state.user,))
         completed_pickups = c.fetchone()[0]
+
+        # total redemptions
+        c.execute("SELECT COUNT(*) FROM redemptions WHERE user_email=?", (st.session_state.user,))
+        total_redemptions = c.fetchone()[0]
 
         conn.close()
 
         available_points = total_earned - total_redeemed
 
+        reward_catalog = [
+            ("TNG Reload Pin RM8", 80),
+            ("AEON Voucher RM10", 100),
+            ("Shopee Voucher RM10", 100),
+            ("GrabFood Voucher RM10", 100),
+            ("Lazada Voucher RM10", 100)
+        ]
+
+        next_reward_name = None
+        next_reward_points = None
+
+        for reward_name, points_required in reward_catalog:
+            if available_points < points_required:
+                next_reward_name = reward_name
+                next_reward_points = points_required
+                break
+
+        if next_reward_name is None:
+            next_reward_name = "All listed rewards unlocked"
+            next_reward_points = available_points if available_points > 0 else 1
+
+        points_needed = max(next_reward_points - available_points, 0)
+        progress_value = min(available_points / next_reward_points, 1.0) if next_reward_points > 0 else 0
+
         if user_info:
             name, email = user_info
 
-            st.write(f"**Name:** {name}")
+            st.markdown(f"## 👋 Hello, {name}")
             st.write(f"**Email:** {email}")
-            st.write(f"**Role:** USER")
 
-            col1, col2 = st.columns(2)
+            st.markdown("### 🎯 Reward Progress")
+
+            if next_reward_name == "All listed rewards unlocked":
+                st.success("You have enough points to redeem all currently listed rewards.")
+                st.progress(1.0)
+            else:
+                st.info(f"Next Reward: {next_reward_name}")
+                st.write(f"You need **{points_needed} more points** to redeem this reward.")
+                st.progress(progress_value)
+
+            col1, col2, col3 = st.columns(3)
 
             with col1:
                 st.metric("Total Earned Points", total_earned)
-                st.metric("Available Points", available_points)
                 st.metric("Total Reward Records", total_reward_records)
 
             with col2:
-                st.metric("Total Redeemed Points", total_redeemed)
-                st.metric("Total Pickup Requests", total_pickup_requests)
+                st.metric("Available Points", available_points)
+                st.metric("Pickup Requests", total_pickup_requests)
+
+            with col3:
                 st.metric("Completed Pickups", completed_pickups)
+                st.metric("Total Redemptions", total_redemptions)
+
         else:
-            st.error("User profile not found.")
+            st.error("User info not found.")
