@@ -27,6 +27,8 @@ st.markdown("""
     font-weight: 700;
     font-size: 15px;
     padding-top: 8px;
+    line-height: 1.2;
+    text-align: center;
 }
 
 /* text-style buttons */
@@ -282,13 +284,25 @@ if st.session_state.user:
     with st.sidebar:
         st.title("Navigation")
 
-        if st.session_state.role == "USER":
-            page = st.radio(
-                "Go to",
-                ["Home", "Upload Waste", "Reward Status", "Pickup Scheduling", "Reward History","Redeem Rewards","Redemption History","Profile", "Logout"],
-                key="user_page_nav"
-            )
-            st.session_state.page = page
+        if st.session_state.user:
+            with st.sidebar:
+                st.title("Navigation")
+
+                if st.session_state.role == "USER":
+                    user_pages = ["Home", "Upload Waste", "Reward Status", "Pickup Scheduling", "Reward History", "Redeem Rewards", "Redemption History", "Profile", "Logout"]
+
+                    if st.session_state.page not in user_pages:
+                        st.session_state.page = "Home"
+
+                    current_index = user_pages.index(st.session_state.page)
+
+                    page = st.radio(
+                        "Go to",
+                        user_pages,
+                        index=current_index,
+                        key="user_page_nav"
+                    )
+                    st.session_state.page = page
 
         elif st.session_state.role == "ADMIN":
             page = st.radio(
@@ -894,7 +908,7 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
 elif st.session_state.role == "USER" and st.session_state.user:
 
     if st.session_state.page == "Home":
-        nav1, nav2, nav3, nav4, nav5, nav6 = st.columns([3.2, 1.0, 1.8, 2.4, 2.0, 1.3])
+        nav1, nav2, nav3, nav4, nav5, nav6 = st.columns([2.8, 1.0, 1.8, 2.2, 2.0, 1.4])
 
         with nav1:
             st.markdown('<div class="nav-logo">♻️ SMART RECYCLING</div>', unsafe_allow_html=True)
@@ -909,25 +923,25 @@ elif st.session_state.role == "USER" and st.session_state.user:
 
         with nav3:
             if st.session_state.page == "Reward History":
-                st.markdown('<div class="nav-active">REWARD HISTORY</div>', unsafe_allow_html=True)
+                st.markdown('<div class="nav-active">REWARD<br>HISTORY</div>', unsafe_allow_html=True)
             else:
-                if st.button("REWARD HISTORY", key="nav_reward_history", type="tertiary", use_container_width=True):
+                if st.button("REWARD\nHISTORY", key="nav_reward_history", type="tertiary", use_container_width=True):
                     st.session_state.page = "Reward History"
                     st.rerun()
 
         with nav4:
             if st.session_state.page == "Redemption History":
-                st.markdown('<div class="nav-active">REDEMPTION HISTORY</div>', unsafe_allow_html=True)
+                st.markdown('<div class="nav-active">REDEMPTION<br>HISTORY</div>', unsafe_allow_html=True)
             else:
-                if st.button("REDEMPTION HISTORY", key="nav_redemption_history", type="tertiary", use_container_width=True):
+                if st.button("REDEMPTION\nHISTORY", key="nav_redemption_history", type="tertiary", use_container_width=True):
                     st.session_state.page = "Redemption History"
                     st.rerun()
 
         with nav5:
             if st.session_state.page == "Redeem Rewards":
-                st.markdown('<div class="nav-active">REDEEM REWARDS</div>', unsafe_allow_html=True)
+                st.markdown('<div class="nav-active">REDEEM<br>REWARDS</div>', unsafe_allow_html=True)
             else:
-                if st.button("REDEEM REWARDS", key="nav_redeem_rewards", type="tertiary", use_container_width=True):
+                if st.button("REDEEM\nREWARDS", key="nav_redeem_rewards", type="tertiary", use_container_width=True):
                     st.session_state.page = "Redeem Rewards"
                     st.rerun()
 
