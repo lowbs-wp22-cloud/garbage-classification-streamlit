@@ -292,15 +292,24 @@ if st.session_state.user:
         st.title("Navigation")
 
         if st.session_state.role == "USER":
-            sidebar_pages = ["Home", "Upload Waste", "Reward Status", "Pickup Scheduling", "Logout"]
-            top_nav_only_pages = ["Reward History", "Redemption History", "Redeem Rewards", "Profile"]
+            sidebar_pages = ["Logout"]
+            top_nav_only_pages = [
+                "Home",
+                "Upload Waste",
+                "Reward Status",
+                "Pickup Scheduling",
+                "Reward History",
+                "Redemption History",
+                "Redeem Rewards",
+                "Profile"
+            ]
             allowed_pages = sidebar_pages + top_nav_only_pages
 
             if st.session_state.page not in allowed_pages:
                 st.session_state.page = "Home"
 
             if "user_page_nav" not in st.session_state:
-                st.session_state.user_page_nav = "Home"
+                st.session_state.user_page_nav = "Logout"
 
             if st.session_state.page in sidebar_pages:
                 st.session_state.user_page_nav = st.session_state.page
