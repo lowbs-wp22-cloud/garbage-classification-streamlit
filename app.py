@@ -394,26 +394,6 @@ if st.session_state.role is None:
 # ADMIN LOGIN / SIGNUP
 # =============================
 if st.session_state.role == "ADMIN" and st.session_state.user is None:
-    st.markdown("""
-    <style>
-
-    /* ALL form labels (Choose an option, Email, Password, Confirm Password) */
-    div[data-testid="stWidgetLabel"] {
-        color: white !important;
-    }
-
-    /* radio labels (Login / Sign Up) */
-    div[role="radiogroup"] label {
-        color: white !important;
-    }
-
-    /* radio label text */
-    div[role="radiogroup"] label p {
-        color: white !important;
-    }
-
-    </style>
-    """, unsafe_allow_html=True)
     
     st.markdown("""
     <style>
@@ -452,16 +432,20 @@ if st.session_state.role == "ADMIN" and st.session_state.user is None:
         margin-bottom: 18px;
     }
 
-    div[data-testid="stWidgetLabel"] {
+    div[data-testid="stWidgetLabel"] label,
+    div[data-testid="stWidgetLabel"] p,
+    div[data-testid="stWidgetLabel"] span {
         color: white !important;
         font-weight: 600 !important;
     }
 
-    div[role="radiogroup"] label p {
+    div[role="radiogroup"] label,
+    div[role="radiogroup"] label p,
+    div[role="radiogroup"] label span {
         color: white !important;
         font-weight: 600 !important;
     }
-
+    
     div[data-testid="stTextInput"] input {
         background-color: rgba(255,255,255,0.95) !important;
         color: black !important;
@@ -534,26 +518,6 @@ if st.session_state.role == "ADMIN" and st.session_state.user is None:
 # USER LOGIN / SIGNUP
 # =============================
 elif st.session_state.role == "USER" and st.session_state.user is None:
-    st.markdown("""
-    <style>
-
-    /* ALL form labels (Choose an option, Email, Password, Confirm Password) */
-    div[data-testid="stWidgetLabel"] {
-        color: white !important;
-    }
-
-    /* radio labels (Login / Sign Up) */
-    div[role="radiogroup"] label {
-        color: white !important;
-    }
-
-/* radio label text */
-div[role="radiogroup"] label p {
-    color: white !important;
-}
-
-</style>
-""", unsafe_allow_html=True)
     
     st.markdown("""
     <style>
@@ -592,12 +556,16 @@ div[role="radiogroup"] label p {
         margin-bottom: 18px;
     }
 
-    div[data-testid="stWidgetLabel"] {
+    div[data-testid="stWidgetLabel"] label,
+    div[data-testid="stWidgetLabel"] p,
+    div[data-testid="stWidgetLabel"] span {
         color: white !important;
         font-weight: 600 !important;
     }
 
-    div[role="radiogroup"] label p {
+    div[role="radiogroup"] label,
+    div[role="radiogroup"] label p,
+    div[role="radiogroup"] label span {
         color: white !important;
         font-weight: 600 !important;
     }
