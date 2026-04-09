@@ -518,9 +518,6 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
     <style>
 
     /* ONLY labels (Choose an option, Email, Password, Confirm Password) */
-    div[data-testid="stWidgetLabel"] label {
-        color: white !important;
-    }
 
     /* radio label text (Login / Sign Up) */
     div[role="radiogroup"] label p {
