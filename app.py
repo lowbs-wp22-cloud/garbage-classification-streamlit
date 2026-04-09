@@ -591,8 +591,9 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
             st.session_state.role = None
             st.rerun()
 
-        option = st.radio("Choose an option", ["Login", "Sign Up"], key="user_option")
-
+        st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Choose an option</p>", unsafe_allow_html=True)
+        option = st.radio("", ["Login", "Sign Up"], key="user_option", label_visibility="collapsed")
+        
         if option == "Login":
             email = st.text_input("Email", key="user_login_email")
             password = st.text_input("Password", type="password", key="user_login_pw")
