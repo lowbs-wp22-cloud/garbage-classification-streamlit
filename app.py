@@ -894,7 +894,7 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
 elif st.session_state.role == "USER" and st.session_state.user:
 
     if st.session_state.page == "Home":
-        nav1, nav2, nav3, nav4, nav5, nav6 = st.columns([4.2, 1.1, 1.2, 2.0, 2.3, 1.6])
+        nav1, nav2, nav3, nav4, nav5, nav6 = st.columns([3.2, 1.0, 1.8, 2.4, 2.0, 1.3])
 
         with nav1:
             st.markdown('<div class="nav-logo">♻️ SMART RECYCLING</div>', unsafe_allow_html=True)
@@ -908,33 +908,36 @@ elif st.session_state.role == "USER" and st.session_state.user:
                     st.rerun()
 
         with nav3:
-            if st.session_state.page == "Profile":
-                st.markdown('<div class="nav-active">ABOUT</div>', unsafe_allow_html=True)
+            if st.session_state.page == "Reward History":
+                st.markdown('<div class="nav-active">REWARD HISTORY</div>', unsafe_allow_html=True)
             else:
-                if st.button("ABOUT", key="nav_about", type="tertiary", use_container_width=True):
-                    st.session_state.page = "Profile"
+                if st.button("REWARD HISTORY", key="nav_reward_history", type="tertiary", use_container_width=True):
+                    st.session_state.page = "Reward History"
                     st.rerun()
 
         with nav4:
-            if st.session_state.page == "Upload Waste":
-                st.markdown('<div class="nav-active">HOW IT WORKS</div>', unsafe_allow_html=True)
+            if st.session_state.page == "Redemption History":
+                st.markdown('<div class="nav-active">REDEMPTION HISTORY</div>', unsafe_allow_html=True)
             else:
-                if st.button("HOW IT WORKS", key="nav_how", type="tertiary", use_container_width=True):
-                    st.session_state.page = "Upload Waste"
+                if st.button("REDEMPTION HISTORY", key="nav_redemption_history", type="tertiary", use_container_width=True):
+                    st.session_state.page = "Redemption History"
                     st.rerun()
 
         with nav5:
-            if st.session_state.page == "Reward Status":
-                st.markdown('<div class="nav-active">PARTNER BENEFITS</div>', unsafe_allow_html=True)
+            if st.session_state.page == "Redeem Rewards":
+                st.markdown('<div class="nav-active">REDEEM REWARDS</div>', unsafe_allow_html=True)
             else:
-                if st.button("PARTNER BENEFITS", key="nav_partner", type="tertiary", use_container_width=True):
-                    st.session_state.page = "Reward Status"
+                if st.button("REDEEM REWARDS", key="nav_redeem_rewards", type="tertiary", use_container_width=True):
+                    st.session_state.page = "Redeem Rewards"
                     st.rerun()
 
         with nav6:
-            if st.button("INSTANT QUOTE", key="nav_quote", type="primary", use_container_width=True):
-                st.session_state.page = "Redeem Rewards"
-                st.rerun()
+            if st.session_state.page == "Profile":
+                st.markdown('<div class="nav-active">PROFILE</div>', unsafe_allow_html=True)
+            else:
+                if st.button("PROFILE", key="nav_profile", type="primary", use_container_width=True):
+                    st.session_state.page = "Profile"
+                    st.rerun()
 
         st.markdown("<hr style='margin-top:10px; margin-bottom:20px;'>", unsafe_allow_html=True)
         # =============================
