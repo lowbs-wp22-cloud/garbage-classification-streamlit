@@ -285,18 +285,6 @@ def goto_user_page(page_name):
     st.session_state.page = page_name
     st.rerun()
 # =============================
-# SIDEBAR NAVIGATION
-# =============================
-if st.session_state.user and st.session_state.role == "ADMIN":
-    with st.sidebar:
-        st.title("Navigation")
-        page = st.radio(
-            "Go to",
-            ["Home", "Pending Rewards", "Pickup Requests", "Scheduled Pickups", "Analytics", "Logout"],
-            key="admin_page_nav"
-        )
-        st.session_state.page = page
-# =============================
 # ROLE SELECTION (FIXED)
 # =============================
 if st.session_state.role is None:
@@ -656,7 +644,67 @@ if st.session_state.page == "Logout":
 # ADMIN DASHBOARD
 # =============================
 elif st.session_state.role == "ADMIN" and st.session_state.user:
+    # =============================
+    # ADMIN TOP NAVBAR
+    # =============================
+    nav1, nav2, nav3, nav4, nav5, nav6, nav7 = st.columns([3,1.5,2,2,2,1.8,1.2])
 
+    with nav1:
+        st.markdown('<div class="nav-logo">♻️ SMART<br>RECYCLING</div>', unsafe_allow_html=True)
+
+    # HOME
+    with nav2:
+        if st.session_state.page == "Home":
+            st.markdown('<div class="nav-active">HOME</div>', unsafe_allow_html=True)
+        else:
+            if st.button("HOME", key="admin_home", type="tertiary", use_container_width=True):
+                st.session_state.page = "Home"
+                st.rerun()
+
+    # PENDING REWARDS
+    with nav3:
+        if st.session_state.page == "Pending Rewards":
+            st.markdown('<div class="nav-active">PENDING<br>REWARDS</div>', unsafe_allow_html=True)
+        else:
+            if st.button("PENDING\nREWARDS", key="admin_pending", type="tertiary", use_container_width=True):
+                st.session_state.page = "Pending Rewards"
+                st.rerun()
+
+    # PICKUP REQUESTS
+    with nav4:
+        if st.session_state.page == "Pickup Requests":
+            st.markdown('<div class="nav-active">PICKUP<br>REQUESTS</div>', unsafe_allow_html=True)
+        else:
+            if st.button("PICKUP\nREQUESTS", key="admin_requests", type="tertiary", use_container_width=True):
+                st.session_state.page = "Pickup Requests"
+                st.rerun()
+
+    # SCHEDULED PICKUPS
+    with nav5:
+        if st.session_state.page == "Scheduled Pickups":
+            st.markdown('<div class="nav-active">SCHEDULED<br>PICKUPS</div>', unsafe_allow_html=True)
+        else:
+            if st.button("SCHEDULED\nPICKUPS", key="admin_scheduled", type="tertiary", use_container_width=True):
+                st.session_state.page = "Scheduled Pickups"
+                st.rerun()
+
+    # ANALYTICS
+    with nav6:
+        if st.session_state.page == "Analytics":
+            st.markdown('<div class="nav-active">ANALYTICS</div>', unsafe_allow_html=True)
+        else:
+            if st.button("ANALYTICS", key="admin_analytics", type="tertiary", use_container_width=True):
+                st.session_state.page = "Analytics"
+                st.rerun()
+
+    # LOGOUT
+    with nav7:
+        if st.button("LOGOUT", key="admin_logout", type="tertiary", use_container_width=True):
+            for key in ["role", "user", "category", "reward_pending", "show_reward", "page"]:
+                st.session_state[key] = None
+            st.rerun()
+
+    st.markdown("<hr style='margin-top:10px; margin-bottom:20px;'>", unsafe_allow_html=True)
     if st.session_state.page == "Home":
         # =============================
         # HERO BANNER 
