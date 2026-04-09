@@ -1019,8 +1019,6 @@ elif st.session_state.role == "USER" and st.session_state.user:
             st.markdown("---")
             st.markdown("### Quick Guide")
             st.info("Use the sidebar to upload waste, check reward status, schedule pickup, redeem rewards, and view your profile.")
-        else:
-            st.error("User info not found.")
 
     elif st.session_state.page == "Upload Waste" and st.session_state.category is None:
         st.subheader("Select Category")
