@@ -962,16 +962,16 @@ elif st.session_state.role == "USER" and st.session_state.user:
     
         st.markdown("<hr style='margin-top:10px; margin-bottom:20px;'>", unsafe_allow_html=True)
 
-    if st.session_state.page == "Home":
-        if st.session_state.role == "USER" and st.session_state.user and st.session_state.page == "Home":
-            st.markdown("""
-            <style>
-            button[kind="tertiary"][data-testid="baseButton-secondary"][aria-label="HOME"] {
-                color: #2fa4dc !important;
-                font-weight: 700 !important;
-            }
-            </style>
-            """, unsafe_allow_html=True)
+        if st.session_state.page == "Home":
+            if st.session_state.role == "USER" and st.session_state.user and st.session_state.page == "Home":
+                st.markdown("""
+                <style>
+                button[kind="tertiary"][data-testid="baseButton-secondary"][aria-label="HOME"] {
+                    color: #2fa4dc !important;
+                    font-weight: 700 !important;
+                }
+                </style>
+                """, unsafe_allow_html=True)
         
         # =============================
         # HERO BANNER 
