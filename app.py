@@ -553,18 +553,20 @@ if st.session_state.role == "ADMIN" and st.session_state.user is None:
 elif st.session_state.role == "USER" and st.session_state.user is None:
 
     # full-page auth background
-   st.markdown("""
-   <style>
-   div[data-testid="stWidgetLabel"] {
-       color: white !important;
+    st.markdown("""
+    <style>
+    div[data-testid="stWidgetLabel"] {
+        color: white !important;
     }
     div[role="radiogroup"] label p {
         color: white !important;
     }
     </style>
     """, unsafe_allow_html=True)
-st.markdown("<div style='height:12vh;'></div>", unsafe_allow_html=True)
-left, center, right = st.columns([1.2, 2.2, 1.2])
+
+    st.markdown("<div style='height:12vh;'></div>", unsafe_allow_html=True)
+
+    left, center, right = st.columns([1.2, 2.2, 1.2])
 
     with center:
         st.markdown('<div class="auth-title-center">👤 USER Login / Sign Up</div>', unsafe_allow_html=True)
