@@ -646,7 +646,7 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
     # =============================
     # ADMIN TOP NAVBAR
     # =============================
-    nav1, nav2, nav3, nav4, nav5, nav6, nav7 = st.columns([3,1.5,2,2,2,1.8,1.2])
+    nav1, nav2, nav3, nav4, nav5, nav6, nav7 = st.columns([3,1.3,1.9,1.9,2.6,1.5,1.0])
 
     with nav1:
         st.markdown('<div class="nav-logo">♻️ SMART<br>RECYCLING</div>', unsafe_allow_html=True)
