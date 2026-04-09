@@ -932,7 +932,7 @@ elif st.session_state.role == "USER" and st.session_state.user:
 
         with nav2:
             if st.session_state.page == "Home":
-                st.button("HOME", key="nav_home_active", type="primary", use_container_width=True)
+                st.markdown('<div class="nav-active">HOME</div>', unsafe_allow_html=True)
             else:
                 if st.button("HOME", key="nav_home", type="tertiary", use_container_width=True):
                     st.session_state.page = "Home"
@@ -966,10 +966,10 @@ elif st.session_state.role == "USER" and st.session_state.user:
             if st.session_state.page == "Profile":
                 st.markdown('<div class="nav-active">PROFILE</div>', unsafe_allow_html=True)
             else:
-                if st.button("PROFILE", key="nav_profile", type="primary", use_container_width=True):
+                if st.button("PROFILE", key="nav_profile", type="tertiary", use_container_width=True):
                     st.session_state.page = "Profile"
                     st.rerun()
-
+    
         st.markdown("<hr style='margin-top:10px; margin-bottom:20px;'>", unsafe_allow_html=True)
         # =============================
         # HERO BANNER 
