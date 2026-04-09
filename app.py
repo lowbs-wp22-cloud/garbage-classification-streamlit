@@ -314,13 +314,16 @@ if st.session_state.user:
             if page != st.session_state.page and page in sidebar_pages:
                 st.session_state.page = page
 
-        elif st.session_state.role == "ADMIN":
-            page = st.radio(
-                "Go to",
-                ["Home", "Pending Rewards", "Pickup Requests", "Scheduled Pickups", "Analytics", "Logout"],
-                key="admin_page_nav"
-            )
-            st.session_state.page = page
+        if st.session_state.user:
+            if st.session_state.role == "ADMIN":
+                with st.sidebar:
+                    st.title("Navigation")
+                    page = st.radio(
+                        "Go to",
+                        ["Home", "Pending Rewards", "Pickup Requests", "Scheduled Pickups", "Analytics", "Logout"],
+                        key="admin_page_nav"
+                    )
+                    st.session_state.page = page
 # =============================
 # ROLE SELECTION (FIXED)
 # =============================
