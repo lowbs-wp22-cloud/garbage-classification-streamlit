@@ -990,36 +990,6 @@ elif st.session_state.role == "USER" and st.session_state.user:
         st.markdown("### Welcome to your recycling dashboard")
 
         # your Home dashboard code continues here
-        
-        # =============================
-        # HERO BANNER 
-        # =============================
-        st.markdown("""
-        <div style="
-            background-image: url('https://images.unsplash.com/photo-1604187351574-c75ca79f5807');
-            height: 300px;
-            background-size: cover;
-            background-position: center;
-            border-radius: 12px;
-            position: relative;
-            margin-bottom: 20px;
-        ">
-            <div style="
-                position: absolute;
-                bottom: 20px;
-                left: 30px;
-                color: white;
-            ">
-                <h1 style="margin-bottom:5px;">♻️ Smart Recycling Reward System</h1>
-                <p style="font-size:18px;">Earn rewards while saving the environment</p>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        # spacing
-        st.markdown("<br>", unsafe_allow_html=True)      
-        
-        st.markdown("### Welcome to your recycling dashboard")
 
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
