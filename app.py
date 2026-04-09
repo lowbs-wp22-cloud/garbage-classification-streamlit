@@ -921,11 +921,11 @@ elif st.session_state.role == "USER" and st.session_state.user:
 
     with nav5:
         if st.session_state.page == "Redeem Rewards":
-            st.markdown('<div class="nav-active">REDEEM<br>REWARDS</div>', unsafe_allow_html=True)
+            st.markdown('<div class="nav-active">QUICK<br>ACTION</div>', unsafe_allow_html=True)
         else:
-            if st.button("REDEEM\nREWARDS", key="nav_redeem_rewards", type="tertiary", use_container_width=True):
+            if st.button("QUICK\nACTION", key="nav_redeem_rewards", type="tertiary", use_container_width=True):
                 goto_user_page("Redeem Rewards")
-
+                
     with nav6:
         if st.session_state.page == "Profile":
             st.markdown('<div class="nav-active">PROFILE</div>', unsafe_allow_html=True)
