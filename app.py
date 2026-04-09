@@ -704,7 +704,7 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
                 st.session_state[key] = None
             st.rerun()
 
-    st.markdown('<div class="nav-active">LOG<br>OUT</div>', unsafe_allow_html=True)
+    st.markdown("<hr style='margin-top:10px; margin-bottom:20px;'>", unsafe_allow_html=True)
     if st.session_state.page == "Home":
         # =============================
         # HERO BANNER 
