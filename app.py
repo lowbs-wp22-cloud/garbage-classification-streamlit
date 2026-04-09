@@ -19,7 +19,8 @@ st.markdown("""
     font-weight: 800;
     color: #2fa4dc;
     letter-spacing: 1px;
-    white-space: nowrap;
+    white-space: normal;
+    line-height: 1.2;
 }
 
 .nav-active {
@@ -915,14 +916,23 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
 elif st.session_state.role == "USER" and st.session_state.user:
 
     if st.session_state.page == "Home":
+        if st.session_state.role == "USER" and st.session_state.user and st.session_state.page == "Home":
+            st.markdown("""
+            <style>
+            button[kind="tertiary"][data-testid="baseButton-secondary"][aria-label="HOME"] {
+                color: #2fa4dc !important;
+                font-weight: 700 !important;
+            }
+            </style>
+            """, unsafe_allow_html=True)
         nav1, nav2, nav3, nav4, nav5, nav6 = st.columns([3.2, 1.2, 2.0, 2.4, 2.2, 1.6])
 
         with nav1:
-            st.markdown('<div class="nav-logo">♻️ SMART RECYCLING</div>', unsafe_allow_html=True)
+            st.markdown('<div class="nav-logo">♻️ SMART<br>RECYCLING</div>', unsafe_allow_html=True)
 
         with nav2:
             if st.session_state.page == "Home":
-                st.markdown('<div class="nav-active">HOME</div>', unsafe_allow_html=True)
+                st.button("HOME", key="nav_home_active", type="primary", use_container_width=True)
             else:
                 if st.button("HOME", key="nav_home", type="tertiary", use_container_width=True):
                     st.session_state.page = "Home"
