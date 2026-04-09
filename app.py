@@ -987,10 +987,6 @@ elif st.session_state.role == "USER" and st.session_state.user:
                 st.session_state.page = "Redeem Rewards"
                 st.rerun()
 
-            st.markdown("---")
-            st.markdown("### Quick Guide")
-            st.info("Use the sidebar to upload waste, check reward status, schedule pickup, redeem rewards, and view your profile.")
-    
     elif st.session_state.page == "Upload Waste" and st.session_state.category is None:
         st.markdown("## Select Category")
         st.markdown("**Step 1 of 3** · Choose the type of waste you want to classify")
