@@ -287,35 +287,33 @@ if st.session_state.user:
     with st.sidebar:
         st.title("Navigation")
 
-        if st.session_state.user:
-            with st.sidebar:
-                st.title("Navigation")
+        if st.session_state.role == "USER":
+            sidebar_pages = ["Home", "Upload Waste", "Reward Status", "Pickup Scheduling", "Logout"]
+            top_nav_only_pages = ["Reward History", "Redemption History", "Redeem Rewards", "Profile"]
+            allowed_pages = sidebar_pages + top_nav_only_pages
 
-                if st.session_state.role == "USER":
-                    sidebar_pages = ["Home", "Upload Waste", "Reward Status", "Pickup Scheduling", "Logout"]
-                    top_nav_only_pages = ["Reward History", "Redemption History", "Redeem Rewards", "Profile"]
-                    allowed_pages = sidebar_pages + top_nav_only_pages
+            if st.session_state.page not in allowed_pages:
+                st.session_state.page = "Home"
 
-                    if st.session_state.page not in allowed_pages:
-                        st.session_state.page = "Home"
+            if "user_page_nav" not in st.session_state:
+                st.session_state.user_page_nav = "Home"
 
-                    sidebar_current = st.session_state.page if st.session_state.page in sidebar_pages else "Home"
-                    current_index = sidebar_pages.index(sidebar_current)
+            if st.session_state.page in sidebar_pages:
+                st.session_state.user_page_nav = st.session_state.page
 
-                    page = st.radio(
-                        "Go to",
-                        sidebar_pages,
-                        index=current_index,
-                        key="user_page_nav"
-                    )
+            page = st.radio(
+                "Go to",
+                sidebar_pages,
+                key="user_page_nav"
+            )
 
-                    if page != sidebar_current:
-                        st.session_state.page = page
+            if page != st.session_state.page and page in sidebar_pages:
+                st.session_state.page = page
 
         elif st.session_state.role == "ADMIN":
             page = st.radio(
                 "Go to",
-                ["Home", "Pending Rewards","Pickup Requests","Scheduled Pickups","Analytics", "Logout"],
+                ["Home", "Pending Rewards", "Pickup Requests", "Scheduled Pickups", "Analytics", "Logout"],
                 key="admin_page_nav"
             )
             st.session_state.page = page
