@@ -45,7 +45,6 @@ div[data-testid="stButton"] button[kind="tertiary"] {
     line-height: 1.2 !important;
     padding: 8px 4px !important;
 }
-
 div[data-testid="stButton"] button[kind="tertiary"]:hover {
     background: transparent !important;
     color: #2fa4dc !important;
