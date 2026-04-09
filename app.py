@@ -736,7 +736,7 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
 
         st.title("Admin Dashboard")
         st.write("Welcome, Admin.")
-        st.write("Use the sidebar to manage the system.")
+        st.write("Use the top navigation bar to manage the system.")
 
     elif st.session_state.page == "Pending Rewards":
         st.title("Admin Dashboard - Pending Rewards")
@@ -968,12 +968,10 @@ elif st.session_state.role == "USER" and st.session_state.user:
                 goto_user_page("Redemption History")
 
     with nav5:
-        if st.session_state.page == "Scheduled Pickups":
-            st.markdown('<div class="nav-active">SCHEDULED<br>PICKUPS</div>', unsafe_allow_html=True)
-        else:
-            if st.button("SCHEDULED PICKUPS", key="admin_scheduled", type="tertiary", use_container_width=True):
-                st.session_state.page = "Scheduled Pickups"
-                st.rerun()
+        if st.button("LOG\nOUT", key="nav_logout", type="tertiary", use_container_width=True):
+            for key in ["role", "user", "category", "reward_pending", "show_reward", "page"]:
+                st.session_state[key] = None
+            st.rerun()
                 
     with nav6:
         if st.session_state.page == "Profile":
