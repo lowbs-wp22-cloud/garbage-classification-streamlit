@@ -1195,32 +1195,54 @@ elif st.session_state.role == "USER" and st.session_state.user:
 
     elif st.session_state.page == "Reward Status":
         st.subheader("🎁 Reward Status")
+
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
-        c.execute(
-            "SELECT points, status, station FROM rewards WHERE user_email=? ORDER BY id DESC LIMIT 1",
-            (st.session_state.user,)
-        )
-        reward = c.fetchone()
+
+        c.execute("""
+            SELECT predicted_label, status
+            FROM pickup_requests
+            WHERE user_email=?
+            ORDER BY created_at DESC
+        """, (st.session_state.user,))
+    
+        requests = c.fetchall()
         conn.close()
 
-        status = None
+        if requests:
+            pending = []
+            approved = []
+            rejected = []
 
-        if reward:
-            points, status, station = reward
-            st.info(f"You earned **{points} points** (Status: {status})")
+            for label, status in requests:
+                if status == "PENDING_APPROVAL":
+                    pending.append(label)
+                elif status == "APPROVED":
+                    approved.append(label)
+                elif status == "REJECTED":
+                    rejected.append(label)
 
-            if status == "PENDING":
-                st.warning("Waiting for ADMIN approval...")
+            # Pending
+            if pending:
+                st.warning("⏳ Waiting for ADMIN approval:")
+                for item in pending:
+                    st.write(f"- {item}")
 
-            elif status == "APPROVED":
-                if station == "Door-to-door pickup completed":
-                    st.success("Bulky waste pickup completed successfully. 30 points have been added to your account.")
-                else:
-                    st.success("Reward approved! You may drop off your recyclable items at one of the suggested recycling stations below.")
+            # Approved
+            if approved:
+                st.success("✅ Approved items:")
+                for item in approved:
+                    st.write(f"- {item}")
+
+            # Rejected
+            if rejected:
+                st.error("❌ Rejected items:")
+                for item in rejected:
+                    st.write(f"- {item}")
+
         else:
-            st.info("No reward record found yet.")
-    
+            st.info("No uploaded items yet.")
+            
         st.markdown("### Suggested Recycling Stations")
 
         stations = [
