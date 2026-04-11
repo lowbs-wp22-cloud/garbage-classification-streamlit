@@ -633,7 +633,33 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
                     
             if st.button("Forgot Password?", key="forgot_password_btn"):
                     st.session_state.show_forgot_password = True
-            
+
+            if st.session_state.show_forgot_password:
+                st.markdown("### 🔑 Reset Password")
+
+                reset_email = st.text_input("Enter your registered email", key="reset_email")
+                new_password = st.text_input("Enter new password", type="password", key="reset_new_password")
+                confirm_new_password = st.text_input("Confirm new password", type="password", key="reset_confirm_password")
+
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    if st.button("Update Password", key="update_password_btn"):
+                        if not reset_email or not new_password or not confirm_new_password:
+                            st.error("All fields are required.")
+                        elif new_password != confirm_new_password:
+                            st.error("Passwords do not match.")
+                        elif reset_user_password(reset_email, new_password):
+                            st.success("Password updated successfully. Please log in.")
+                            st.session_state.show_forgot_password = False
+                        else:
+                            st.error("Email not found.")
+
+                with col2:
+                    if st.button("Cancel", key="cancel_reset_btn"):
+                        st.session_state.show_forgot_password = False
+                        st.rerun()
+
         elif option == "Sign Up":
             st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Name</p>", unsafe_allow_html=True)
             name = st.text_input("", key="user_signup_name", label_visibility="collapsed")
