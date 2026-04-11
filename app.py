@@ -227,40 +227,33 @@ init_db()
 # =============================
 # LOAD MODELS
 # =============================
+from pathlib import Path
+
 @st.cache_resource
 def load_garbage_model():
     model_path = Path(__file__).parent / "FYP_general_waste.h5"
 
     if not model_path.exists():
-        raise FileNotFoundError(
-            f"General waste model not found: {model_path}"
-        )
+        raise FileNotFoundError(f"General waste model not found: {model_path}")
 
-    # Detect Git LFS pointer / wrong file / corrupted upload
     with open(model_path, "rb") as f:
         header = f.read(256)
 
     if header.startswith(b"version https://git-lfs.github.com/spec"):
         raise RuntimeError(
             "FYP_general_waste.h5 in the repository is a Git LFS pointer, "
-            "not the actual model file. Upload the real .h5 binary to the repo "
-            "or use a direct download method."
+            "not the actual model file."
         )
 
     if len(header) < 8:
-        raise RuntimeError(
-            "FYP_general_waste.h5 is too small or corrupted."
-        )
+        raise RuntimeError("FYP_general_waste.h5 is too small or corrupted.")
 
     try:
-        # compile=False is safer for inference-only deployment
         model = tf.keras.models.load_model(model_path, compile=False)
         return model
     except Exception as e:
         raise RuntimeError(
-            f"Failed to load general waste model from {model_path}. "
-            f"The file may be corrupted, incomplete, or not a valid HDF5 model. "
-            f"Original error: {e}"
+            f"Failed to load general waste model from {model_path}. Original error: {e}"
         )
     
 @st.cache_resource
