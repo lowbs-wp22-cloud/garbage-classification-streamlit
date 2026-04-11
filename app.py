@@ -1273,41 +1273,19 @@ elif st.session_state.role == "USER" and st.session_state.user:
                         else:
                             conn = sqlite3.connect(DB_PATH)
                             c = conn.cursor()
-
-                            # Check duplicate active request for same user and same item
-                            c.execute("""
-                                SELECT id, status
-                                FROM pickup_requests
-                                WHERE user_email=? AND predicted_label=? AND status IN ('PENDING_APPROVAL', 'APPROVED', 'SCHEDULED')
-                                ORDER BY created_at DESC
-                                LIMIT 1
-                            """, (st.session_state.user, result))
-                            existing_request = c.fetchone()
-
-                            if existing_request:
-                                existing_id, existing_status = existing_request
-                                conn.close()
-
-                                if existing_status == "PENDING_APPROVAL":
-                                    st.warning(f"⚠️ You already submitted '{result}' and it is still waiting for admin approval.")
-                                elif existing_status == "APPROVED":
-                                    st.warning(f"⚠️ '{result}' has already been approved by admin. Please go to Pickup Scheduling.")
-                                elif existing_status == "SCHEDULED":
-                                    st.warning(f"⚠️ '{result}' has already been scheduled for pickup.")
-                            else:
-                                c.execute(
-                                    """
-                                    INSERT INTO pickup_requests
-                                    (user_email, predicted_label, confidence, address, pickup_date, pickup_time_slot, note, status)
-                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                            c.execute(
+                                """
+                                INSERT INTO pickup_requests
+                                (user_email, predicted_label, confidence, address, pickup_date, pickup_time_slot, note, status)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                                     """,
-                                    (st.session_state.user, result, confidence, None, None, None, None, "PENDING_APPROVAL")
+                                (st.session_state.user, result, confidence, None, None, None, None, "PENDING_APPROVAL")
                                 )
-                                conn.commit()
-                                conn.close()
+                            conn.commit()
+                            conn.close()
 
-                                st.success("✅ Bulky waste request submitted successfully.")
-                                st.info("Your bulky waste request is now pending admin approval.")
+                            st.success("✅ Bulky waste request submitted successfully.")
+                            st.info("Your bulky waste request is now pending admin approval.")
 
             except Exception as e:
                 st.error(f"Prediction failed: {e}")
