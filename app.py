@@ -284,6 +284,22 @@ def signup_user(name, email, password):
     conn.close()
     return True
 
+def reset_user_password(email, new_password):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT * FROM users WHERE email=?", (email,))
+    user = c.fetchone()
+
+    if not user:
+        conn.close()
+        return False
+
+    hashed_password = generate_password_hash(new_password)
+    c.execute("UPDATE users SET password=? WHERE email=?", (hashed_password, email))
+    conn.commit()
+    conn.close()
+    return True
+
 def goto_user_page(page_name):
     st.session_state.page = page_name
     st.rerun()
