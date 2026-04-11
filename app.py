@@ -248,7 +248,24 @@ def load_furniture_model():
     
 @st.cache_resource
 def load_garbage_model():
-    return tf.keras.models.load_model("FYP_general_waste.h5", compile=False)
+    model_path = "FYP_general_waste.h5"
+
+    if not os.path.exists(model_path):
+        raise FileNotFoundError(f"Model file not found: {model_path}")
+
+    file_size = os.path.getsize(model_path)
+    if file_size < 10000:
+        raise RuntimeError(
+            f"FYP_general_waste.h5 looks invalid or too small ({file_size} bytes)."
+        )
+
+    try:
+        return tf.keras.models.load_model(model_path, compile=False)
+    except Exception as e:
+        raise RuntimeError(
+            f"Could not load FYP_general_waste.h5. "
+            f"The file is likely corrupted or not a real H5 model. Original error: {e}"
+        )
 
 
 # =============================
