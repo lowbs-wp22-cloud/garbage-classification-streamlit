@@ -259,6 +259,8 @@ for key in ["role", "user", "category", "reward_pending", "show_reward", "page"]
     if key not in st.session_state:
         st.session_state[key] = None
 
+if "show_forgot_password" not in st.session_state:
+    st.session_state.show_forgot_password = False
 # =============================
 # AUTH FUNCTIONS
 # =============================
