@@ -227,9 +227,9 @@ init_db()
 # =============================
 # LOAD MODELS
 # =============================
-import tensorflow as tf
-model = tf.keras.models.load_model("FYP_general_waste.h5")
-print("loaded ok")
+@st.cache_resource
+def load_garbage_model():
+    return tf.keras.models.load_model("FYP_general_waste.h5")
     
 @st.cache_resource
 def load_furniture_model():
