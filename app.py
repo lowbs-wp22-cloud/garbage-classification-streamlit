@@ -639,8 +639,13 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
 
                 st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Enter your registered email</p>", unsafe_allow_html=True)
                 reset_email = st.text_input("", key="reset_email", label_visibility="collapsed")
-                new_password = st.text_input("Enter new password", type="password", key="reset_new_password")
-                confirm_new_password = st.text_input("Confirm new password", type="password", key="reset_confirm_password")
+                st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Enter new password</p>", unsafe_allow_html=True)
+                new_password = st.text_input("", type="password", key="reset_new_password", label_visibility="collapsed")
+
+                # Confirm Password
+                st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Confirm new password</p>", unsafe_allow_html=True)
+                confirm_new_password = st.text_input("", type="password", key="reset_confirm_password", label_visibility="collapsed")
+
 
                 col1, col2 = st.columns(2)
 
