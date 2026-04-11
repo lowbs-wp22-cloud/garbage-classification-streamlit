@@ -637,7 +637,8 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
             if st.session_state.show_forgot_password:
                 st.markdown("### 🔑 Reset Password")
 
-                reset_email = st.text_input("Enter your registered email", key="reset_email")
+                st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Enter your registered email</p>", unsafe_allow_html=True)
+                reset_email = st.text_input("", key="reset_email", label_visibility="collapsed")
                 new_password = st.text_input("Enter new password", type="password", key="reset_new_password")
                 confirm_new_password = st.text_input("Confirm new password", type="password", key="reset_confirm_password")
 
