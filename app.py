@@ -248,7 +248,7 @@ def load_furniture_model():
     
 @st.cache_resource
 def load_garbage_model():
-    return tf.keras.models.load.model("FYP_general_waste.h5")
+    return tf.keras.models.load_model("FYP_general_waste.h5", compile=False)
 
 
 # =============================
