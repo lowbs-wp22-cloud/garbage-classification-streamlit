@@ -7,7 +7,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import gdown
 import json
+import pandas as pd
+import plotly.express as px
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
+
 
 # =============================
 # CUSTOM CSS (UI DESIGN)
@@ -873,67 +876,160 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
             
     elif st.session_state.page == "Analytics":
         st.title("Admin Dashboard - Analytics")
+        st.write("Monitor users, pickup activity, rewards, and redemption performance.")
 
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
 
-        # Total users
+        # Summary numbers
         c.execute("SELECT COUNT(*) FROM users")
         total_users = c.fetchone()[0]
 
-        # Total rewards records
         c.execute("SELECT COUNT(*) FROM rewards")
         total_rewards = c.fetchone()[0]
 
-        # Total points awarded
         c.execute("SELECT COALESCE(SUM(points), 0) FROM rewards")
         total_points_awarded = c.fetchone()[0]
 
-        # Total pickup requests
         c.execute("SELECT COUNT(*) FROM pickup_requests")
         total_pickup_requests = c.fetchone()[0]
 
-        # Pending pickup requests
         c.execute("SELECT COUNT(*) FROM pickup_requests WHERE status='PENDING_APPROVAL'")
         pending_pickups = c.fetchone()[0]
 
-        # Approved pickup requests
         c.execute("SELECT COUNT(*) FROM pickup_requests WHERE status='APPROVED'")
         approved_pickups = c.fetchone()[0]
 
-        # Scheduled pickups
         c.execute("SELECT COUNT(*) FROM pickup_requests WHERE status='SCHEDULED'")
         scheduled_pickups = c.fetchone()[0]
 
-        # Completed pickups
         c.execute("SELECT COUNT(*) FROM pickup_requests WHERE status='COMPLETED'")
         completed_pickups = c.fetchone()[0]
 
-        # Rejected pickups
         c.execute("SELECT COUNT(*) FROM pickup_requests WHERE status='REJECTED'")
         rejected_pickups = c.fetchone()[0]
 
-        # Total redemptions
         c.execute("SELECT COUNT(*) FROM redemptions")
         total_redemptions = c.fetchone()[0]
 
+        c.execute("SELECT COALESCE(SUM(points_used), 0) FROM redemptions")
+        total_points_redeemed = c.fetchone()[0]
+
         conn.close()
 
-        col1, col2 = st.columns(2)
+    # =============================
+    # TOP SUMMARY CARDS
+    # =============================
+        top1, top2, top3, top4 = st.columns(4)
 
-        with col1:
+        with top1:
             st.metric("Total Users", total_users)
-            st.metric("Total Rewards Records", total_rewards)
-            st.metric("Total Points Awarded", total_points_awarded)
-            st.metric("Total Pickup Requests", total_pickup_requests)
-            st.metric("Pending Pickup Requests", pending_pickups)
 
-        with col2:
-            st.metric("Approved Pickup Requests", approved_pickups)
-            st.metric("Scheduled Pickups", scheduled_pickups)
-            st.metric("Completed Pickups", completed_pickups)
+        with top2:
+            st.metric("Pickup Requests", total_pickup_requests)
+
+        with top3:
+            st.metric("Points Awarded", total_points_awarded)
+
+        with top4:
+            st.metric("Redemptions", total_redemptions)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        mid1, mid2, mid3, mid4 = st.columns(4)
+
+        with mid1:
+            st.metric("Pending", pending_pickups)
+
+        with mid2:
+            st.metric("Approved", approved_pickups)
+
+        with mid3:
+            st.metric("Scheduled", scheduled_pickups)
+
+        with mid4:
+            st.metric("Completed", completed_pickups)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+    # =============================
+    # CHART 1: PICKUP STATUS DISTRIBUTION
+    # =============================
+        status_data = pd.DataFrame({
+            "Status": ["Pending", "Approved", "Scheduled", "Completed", "Rejected"],
+            "Count": [pending_pickups, approved_pickups, scheduled_pickups, completed_pickups, rejected_pickups]
+        })
+
+        chart_col1, chart_col2 = st.columns(2)
+
+        with chart_col1:
+            fig_status = px.pie(
+                status_data,
+                names="Status",
+                values="Count",
+                title="Pickup Status Distribution"
+            )
+            fig_status.update_layout(height=420)
+            st.plotly_chart(fig_status, use_container_width=True)
+
+    # =============================
+    # CHART 2: POINTS OVERVIEW
+    # =============================
+        points_data = pd.DataFrame({
+            "Category": ["Points Awarded", "Points Redeemed"],
+            "Value": [total_points_awarded, total_points_redeemed]
+        })
+
+        with chart_col2:
+            fig_points = px.bar(
+                points_data,
+                x="Category",
+                y="Value",
+                title="Points Overview",
+                text="Value"
+            )
+            fig_points.update_layout(height=420)
+            st.plotly_chart(fig_points, use_container_width=True)
+
+    # =============================
+    # CHART 3: PICKUP REQUESTS OVER TIME
+    # =============================
+        conn = sqlite3.connect(DB_PATH)
+        requests_over_time = pd.read_sql_query("""
+            SELECT DATE(created_at) AS request_date, COUNT(*) AS total_requests
+            FROM pickup_requests
+            GROUP BY DATE(created_at)
+            ORDER BY DATE(created_at)
+        """, conn)
+        conn.close()
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        if not requests_over_time.empty:
+            fig_line = px.line(
+                requests_over_time,
+                x="request_date",
+                y="total_requests",
+                markers=True,
+                title="Pickup Requests Over Time"
+            )
+            fig_line.update_layout(height=420)
+            st.plotly_chart(fig_line, use_container_width=True)
+        else:
+            st.info("No pickup request data available for trend chart.")
+
+    # =============================
+    # OPTIONAL EXTRA DETAILS
+    # =============================
+        st.markdown("<br>", unsafe_allow_html=True)
+        extra1, extra2 = st.columns(2)
+
+        with extra1:
             st.metric("Rejected Pickup Requests", rejected_pickups)
-            st.metric("Total Redemptions", total_redemptions)
+
+        with extra2:
+            st.metric("Total Rewards Records", total_rewards)
+        
 # =============================
 # USER FLOW
 # =============================
