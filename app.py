@@ -1479,18 +1479,25 @@ elif st.session_state.role == "USER" and st.session_state.user:
         st.info(f"Available Points: {available_points}")
 
         reward_catalog = [
-            ("AEON Voucher RM10", 100),
-            ("TNG Reload Pin RM8", 80),
-            ("Shopee Voucher RM10", 100),
-            ("GrabFood Voucher RM10", 100),
-            ("Lazada Voucher RM10", 100)
+            ("💳 TNG Reload Pin RM8", 80),
+            ("🛍️ AEON Voucher RM10", 100),
+            ("🛒 Shopee Voucher RM10", 100),
+            ("🍔 GrabFood Voucher RM10", 100),
+            ("📦 Lazada Voucher RM10", 100)
         ]
 
         for reward_name, points_required in reward_catalog:
-            st.write(f"### {reward_name}")
+            st.subheader(reward_name)
             st.write(f"Required Points: {points_required}")
 
+            progress_value = min(available_points / points_required, 1.0)
+            st.progress(progress_value)
+
+            points_needed = points_required - available_points
+
             if available_points >= points_required:
+                st.success("🎉 You can redeem this reward now!")
+
                 if st.button(f"Redeem {reward_name}", key=f"redeem_{reward_name}"):
                     conn = sqlite3.connect(DB_PATH)
                     c = conn.cursor()
@@ -1507,9 +1514,10 @@ elif st.session_state.role == "USER" and st.session_state.user:
                     st.success(f"✅ You have successfully redeemed {reward_name}.")
                     st.rerun()
             else:
-                st.warning("Not enough points to redeem this reward.")
+                st.button(f"Redeem {reward_name}", key=f"redeem_{reward_name}", disabled=True)
+                st.caption(f"You need {points_needed} more points to redeem this reward.")
 
-            st.markdown("---")
+            st.divider()
 
     elif st.session_state.page == "Redemption History":
         st.subheader("🧾 Redemption History")
