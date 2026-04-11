@@ -229,8 +229,13 @@ init_db()
 # =============================
 @st.cache_resource
 def load_garbage_model():
-    return tf.keras.models.load_model("FYP_general_waste.h5")
+    model_path = "FYP_general_waste.h5"
 
+    if not os.path.exists(model_path):
+        st.error("General waste model file not found: FYP_general_waste.h5")
+        st.stop()
+
+    return tf.keras.models.load_model(model_path)
 @st.cache_resource
 def load_furniture_model():
     model_path = "bulky_classifier.keras"
