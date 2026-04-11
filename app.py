@@ -227,19 +227,9 @@ init_db()
 # =============================
 # LOAD MODELS
 # =============================
-@st.cache_resource
-def load_garbage_model():
-    model_path = "FYP_general_waste.h5"
-
-    if not os.path.exists(model_path):
-        st.error(f"General waste model file not found: {model_path}")
-        st.stop()
-
-    try:
-        return tf.keras.models.load_model(model_path)
-    except Exception as e:
-        st.error(f"Failed to load general waste model: {e}")
-        st.stop()
+import tensorflow as tf
+model = tf.keras.models.load_model("FYP_general_waste.h5")
+print("loaded ok")
     
 @st.cache_resource
 def load_furniture_model():
