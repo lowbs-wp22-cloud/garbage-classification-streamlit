@@ -630,7 +630,10 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
                     st.rerun()
                 else:
                     st.error("Invalid Email or Password")
-
+                    
+            if st.button("Forgot Password?", key="forgot_password_btn"):
+                    st.session_state.show_forgot_password = True
+            
         elif option == "Sign Up":
             st.markdown("<p style='color:white; font-weight:600; margin-bottom:6px;'>Name</p>", unsafe_allow_html=True)
             name = st.text_input("", key="user_signup_name", label_visibility="collapsed")
