@@ -1401,7 +1401,7 @@ elif st.session_state.role == "USER" and st.session_state.user:
             selected_request_id = item_options[selected_item]
 
             address = st.text_area("Pickup Address")
-            pickup_date = st.date_input("Select Pickup Date")
+            pickup_date = st.date_input("Select Pickup Date", min_value=date.today())
             pickup_time_slot = st.selectbox(
                 "Select Pickup Time Slot",
                 ["9:00 AM - 12:00 PM", "12:00 PM - 3:00 PM", "3:00 PM - 6:00 PM"]
@@ -1409,7 +1409,9 @@ elif st.session_state.role == "USER" and st.session_state.user:
             note = st.text_area("Additional Note (Optional)")
 
             if st.button("Confirm Pickup Schedule"):
-                if not address.strip():
+                if pickup_date < date.today():
+                    st.error("Past dates are not allowed. Please select today or a future date.")
+                elif not address.strip():
                     st.error("Please enter your pickup address.")
                 else:
                     conn = sqlite3.connect(DB_PATH)
