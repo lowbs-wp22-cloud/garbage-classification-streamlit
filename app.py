@@ -1481,9 +1481,9 @@ elif st.session_state.role == "USER" and st.session_state.user:
         reward_catalog = [
             ("💳 TNG Reload Pin RM8", 80),
             ("🛍️ AEON Voucher RM10", 100),
-            ("🛒 Shopee Voucher RM10", 100),
+            ("🛒 Shopee Voucher RM20", 200),
             ("🍔 GrabFood Voucher RM10", 100),
-            ("📦 Lazada Voucher RM10", 100)
+            ("📦 Lazada Voucher RM15", 150)
         ]
 
         for reward_name, points_required in reward_catalog:
