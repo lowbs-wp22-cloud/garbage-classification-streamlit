@@ -272,7 +272,23 @@ def load_furniture_model():
         gdown.download(f"https://drive.google.com/uc?id={labels_url}", labels_path, quiet=False)
 
     model = tf.keras.models.load_model(model_path)
+@st.cache_resource
+def load_garbage_model():
+    model_path = "FYP_general_waste.h5"
 
+    # Google Drive file ID (REPLACE THIS)
+    file_id = "1xcMM1lEE3dsIeGu1LdhzPbn9GlcnkP2v"
+
+    if not os.path.exists(model_path):
+        url = f"https://drive.google.com/uc?id={file_id}"
+        gdown.download(url, model_path, quiet=False)
+
+    try:
+        model = tf.keras.models.load_model(model_path, compile=False)
+        return model
+    except Exception as e:
+        raise RuntimeError(f"Failed to load general waste model: {e}")
+        
     with open(labels_path, "r") as f:
         class_names = json.load(f)
 
