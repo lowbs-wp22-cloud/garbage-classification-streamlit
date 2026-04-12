@@ -245,7 +245,24 @@ def load_furniture_model():
         labels_url = "1OAb0O3nvgiB6q_Xn_8naU4oVGkPFrYwd"
         gdown.download(f"https://drive.google.com/uc?id={labels_url}", labels_path, quiet=False)
 
-    model = tf.keras.models.load_model(model_path)
+    try:
+        model = tf.keras.models.load_model(model_path)
+    except Exception as e:
+        st.error(f"Failed to load bulky model: {e}")
+        st.stop()
+
+    try:
+        with open(labels_path, "r") as f:
+            class_names = json.load(f)
+    except Exception as e:
+        st.error(f"Failed to load bulky class labels: {e}")
+        st.stop()
+
+    if not isinstance(class_names, list):
+        st.error("bulky_class_names.json must contain a list of class names.")
+        st.stop()
+
+    return model, class_names
     
 @st.cache_resource
 def load_garbage_model():
