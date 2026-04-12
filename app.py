@@ -1110,33 +1110,6 @@ elif st.session_state.role == "ADMIN" and st.session_state.user:
             st.plotly_chart(fig_points, use_container_width=True)
 
     # =============================
-    # CHART 3: PICKUP REQUESTS OVER TIME
-    # =============================
-        conn = sqlite3.connect(DB_PATH)
-        requests_over_time = pd.read_sql_query("""
-            SELECT DATE(created_at) AS request_date, COUNT(*) AS total_requests
-            FROM pickup_requests
-            GROUP BY DATE(created_at)
-            ORDER BY DATE(created_at)
-        """, conn)
-        conn.close()
-
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        if not requests_over_time.empty:
-            fig_line = px.line(
-                requests_over_time,
-                x="request_date",
-                y="total_requests",
-                markers=True,
-                title="Pickup Requests Over Time"
-            )
-            fig_line.update_layout(height=420)
-            st.plotly_chart(fig_line, use_container_width=True)
-        else:
-            st.info("No pickup request data available for trend chart.")
-
-    # =============================
     # OPTIONAL EXTRA DETAILS
     # =============================
         st.markdown("<br>", unsafe_allow_html=True)
