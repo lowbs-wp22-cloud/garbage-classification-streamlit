@@ -248,7 +248,7 @@ def load_furniture_model():
     
 @st.cache_resource
 def load_garbage_model():
-    model_path = "garbage_classifier.h5"
+    model_path = "FYP_general_waste.h5"
     file_id = "1xcMM1lEE3dsIeGu1LdhzPbn9GlcnkP2v"
 
     if not os.path.exists(model_path):
