@@ -1267,12 +1267,6 @@ elif st.session_state.role == "USER" and st.session_state.user:
 
         expected_furniture = None
         if st.session_state.category == "Furniture":
-            st.info("Supported bulky categories: Chair, Fridge, Table, TV, Wardrobe")
-            expected_furniture = st.selectbox(
-                "Select the bulky item type you are uploading",
-                ["chair image", "fridge image", "table image", "tv image", "wardrobe image"]
-            )
-
         file = st.file_uploader("Upload garbage image", type=["jpg", "png", "jpeg"])
 
         if file:
@@ -1336,8 +1330,6 @@ elif st.session_state.role == "USER" and st.session_state.user:
                     elif st.session_state.category == "Furniture":
                         if confidence < 0.85:
                             st.warning("⚠️ Low confidence for bulky item. No pickup request created. Please try another image.")
-                        elif result != expected_furniture:
-                            st.error("Unsupported bulky item or mismatched prediction. No pickup request created.")
                         else:
                             conn = sqlite3.connect(DB_PATH)
                             c = conn.cursor()
@@ -1346,9 +1338,9 @@ elif st.session_state.role == "USER" and st.session_state.user:
                                 INSERT INTO pickup_requests
                                 (user_email, predicted_label, confidence, address, pickup_date, pickup_time_slot, note, status)
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                                    """,
+                                """,
                                 (st.session_state.user, result, confidence, None, None, None, None, "PENDING_APPROVAL")
-                                )
+                            )
                             conn.commit()
                             conn.close()
 
