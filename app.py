@@ -11,6 +11,7 @@ import pandas as pd
 import plotly.express as px
 from datetime import date
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
+import re
 
 
 # =============================
@@ -279,7 +280,16 @@ if "show_forgot_password" not in st.session_state:
 # =============================
 # AUTH FUNCTIONS
 # =============================
+
+def is_valid_email(email):
+    if not email:
+        return False
+    pattern = r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
+    return re.match(pattern, email) is not None
+
 def login_user(email, password):
+    email = email.strip().lower()
+
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("SELECT password FROM users WHERE email=?", (email,))
@@ -288,15 +298,21 @@ def login_user(email, password):
     return row and check_password_hash(row[0], password)
 
 def signup_user(name, email, password):
+    name = name.strip()
+    email = email.strip().lower()
+
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("SELECT * FROM users WHERE email=?", (email,))
     if c.fetchone():
         conn.close()
         return False
+
     hashed_password = generate_password_hash(password)
-    c.execute("INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-              (name, email, hashed_password))
+    c.execute(
+        "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
+        (name, email, hashed_password)
+    )
     conn.commit()
     conn.close()
     return True
@@ -638,13 +654,19 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
             password = st.text_input("", type="password", key="user_login_pw", label_visibility="collapsed")
 
             if st.button("Login", key="user_login_btn"):
-                if login_user(email, password):
-                    st.session_state.user = email
-                    st.session_state.page = "Home"
-                    st.success("USER login successful!")
-                    st.rerun()
-                else:
-                    st.error("Invalid Email or Password")
+                email = email.strip().lower()
+
+            if not email or not password:
+                st.error("Email and Password are required.")
+            elif not is_valid_email(email):
+                st.error("Please enter a valid email address.")
+            elif login_user(email, password):
+                st.session_state.user = email
+                st.session_state.page = "Home"
+                st.success("USER login successful!")
+                st.rerun()
+            else:
+                st.error("Invalid Email or Password")
                     
             if st.button("Forgot Password?", key="forgot_password_btn"):
                     st.session_state.show_forgot_password = True
@@ -666,15 +688,19 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
 
                 with col1:
                     if st.button("Update Password", key="update_password_btn"):
-                        if not reset_email or not new_password or not confirm_new_password:
-                            st.error("All fields are required.")
-                        elif new_password != confirm_new_password:
-                            st.error("Passwords do not match.")
-                        elif reset_user_password(reset_email, new_password):
-                            st.success("Password updated successfully. Please log in.")
-                            st.session_state.show_forgot_password = False
-                        else:
-                            st.error("Email not found.")
+                        reset_email = reset_email.strip().lower()
+
+                    if not reset_email or not new_password or not confirm_new_password:
+                        st.error("All fields are required.")
+                    elif not is_valid_email(reset_email):
+                        st.error("Please enter a valid email address.")
+                    elif new_password != confirm_new_password:
+                        st.error("Passwords do not match.")
+                    elif reset_user_password(reset_email, new_password):
+                        st.success("Password updated successfully. Please log in.")
+                        st.session_state.show_forgot_password = False
+                    else:
+                        st.error("Email not found.")
 
                 with col2:
                     if st.button("Cancel", key="cancel_reset_btn"):
@@ -695,14 +721,20 @@ elif st.session_state.role == "USER" and st.session_state.user is None:
             confirm = st.text_input("", type="password", key="user_signup_confirm", label_visibility="collapsed")
 
             if st.button("Sign Up", key="user_signup_btn"):
-                if password != confirm:
-                    st.error("Passwords do not match")
-                elif not name or not email or not password:
-                    st.error("All fields are required")
-                elif signup_user(name, email, password):
-                    st.success("Sign Up successful! Please login.")
-                else:
-                    st.error("Email already registered")
+                name = name.strip()
+                email = email.strip().lower()
+
+            if not name or not email or not password or not confirm:
+                st.error("All fields are required")
+            elif not is_valid_email(email):
+                st.error("Please enter a valid email address.")
+            elif password != confirm:
+                st.error("Passwords do not match")
+            elif signup_user(name, email, password):
+                st.success("Sign Up successful! Please login.")
+            else:
+                st.error("Email already registered")
+                
 # =============================
 # LOGOUT HANDLER
 # =============================
