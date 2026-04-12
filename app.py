@@ -1315,6 +1315,15 @@ elif st.session_state.role == "USER" and st.session_state.user:
             st.rerun()
 
         expected_furniture = None
+
+        if st.session_state.category == "Furniture":
+            st.info("Supported bulky categories: Chair, Fridge, Table, TV, Wardrobe")
+
+            expected_furniture = st.selectbox(
+                "Select the bulky item type you are uploading",
+                ["chair image", "fridge image", "table image", "tv image", "wardrobe image"]
+            )
+        
         file = st.file_uploader("Upload garbage image", type=["jpg", "png", "jpeg"])
 
         if file:
