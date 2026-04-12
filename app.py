@@ -1375,9 +1375,6 @@ elif st.session_state.role == "USER" and st.session_state.user:
                             st.session_state.reward_pending = True
                             st.success("✅ 10 points added successfully.")
 
-                            if st.button("Check Reward"):
-                                st.session_state.show_reward = True
-                                st.rerun()
                         else:
                             st.warning("⚠️ Low confidence. No reward given. Please try another image.")
 
