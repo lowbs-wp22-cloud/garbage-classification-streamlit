@@ -1373,7 +1373,7 @@ elif st.session_state.role == "USER" and st.session_state.user:
                             conn.close()
 
                             st.session_state.reward_pending = True
-                            st.success("✅ 10 points added successfully.")
+                            st.success("✅ 10 points pending for admin approval.")
 
                         else:
                             st.warning("⚠️ Low confidence. No reward given. Please try another image.")
